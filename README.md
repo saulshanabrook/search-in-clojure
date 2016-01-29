@@ -46,3 +46,10 @@ Instead of starting to focus on what generalizations can be made between
 search algorithms, I think if we first decide how these two components should
 work and fit together, this will provide the proper constraints to design the
 rest of the system around
+
+### Pure Functions
+Maybe logging is more complicated because it is usually stateful.
+
+Maybe instead I should focus on building the purely functional primitives and ignore logging.
+
+Once those are implemented and can compose together, we can assess the best way to add in the inpurity.
