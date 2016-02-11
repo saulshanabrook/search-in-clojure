@@ -11,7 +11,7 @@
   {:should-evaluate-type type
    :input input})
 
-(defmulti evaluate (fn [config m] (:should-evaluate-type m)))
+(defmulti evaluate (fn [_ m] (:should-evaluate-type m)))
 
 (def should-evaluate-checker (s/checker ShouldEvaluate))
 (defn should-evaluate? [form] (nil? (should-evaluate-checker form)))

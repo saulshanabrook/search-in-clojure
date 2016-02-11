@@ -15,7 +15,13 @@
                    :plugins [[lein-kibit "0.1.2"]
                              [jonase/eastwood "0.2.3"]
                              [lein-ancient "0.6.8"]
-                             [lein-cloverage "1.0.6"]]}}
+                             [lein-cloverage "1.0.6"]
+                             [lein-codox "0.9.4"]]}}
   :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
             "slamhound" ["run" "-m" "slam.hound"]
-            "deps" ["ancient"]})
+            "deps" ["ancient"]}
+  :eastwood {:linters [:all]
+             :exclude-namespaces [search.conjure-utils]}
+  :codox {:src-dir-uri "http://github.com/saulshanabrook/push-in-clojure/blob/master/"
+          :src-linenum-anchor-prefix "L"
+          :defaults {:doc/format :markdown}})

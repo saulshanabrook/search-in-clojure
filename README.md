@@ -1,5 +1,8 @@
 # search
 
+[![Travis branch](https://img.shields.io/travis/saulshanabrook/search-in-clojure/master.svg?style=flat-square)](https://travis-ci.org/saulshanabrook/search-in-clojure) [![API Docs](https://img.shields.io/badge/api%20docs-master-blue.svg?style=flat-square)](http://saulshanabrook.github.io/push-in-clojure/) 
+
+
 A Clojure framework for [metaheauristc search algorithms](https://en.wikipedia.org/wiki/Metaheuristic).
 
 

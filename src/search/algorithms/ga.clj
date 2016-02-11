@@ -1,4 +1,4 @@
-; (ns search.algorithms.ga)
+(ns search.algorithms.ga)
 ;
 ; #_(defn ga)
 ;   ([] (ga (rand)))

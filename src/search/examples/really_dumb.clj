@@ -1,7 +1,5 @@
 (ns search.examples.really-dumb
-  (:require [schema.core :as s]
-
-            [search.core]
+  (:require [search.core]
             [search.config.core :as config]
             [search.recorders.text]))
 

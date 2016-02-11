@@ -1,4 +1,4 @@
-;
+(ns search.algorithms.base)
 ;
 ; (defn individuals->generation [ind->traits step run genomes]
 ;   (map #(map->Individual {:traits (ind->traits %1) :genome %1} ) genomes))

@@ -1,8 +1,5 @@
 (ns search.algorithms.default
-  (:require [schema.core :as s]
-
-            [search.schemas :as schemas]
-            [search.utils :as utils]))
+  (:require [search.utils :as utils]))
 
 (defn algorithm
   "Algorithm that continiously returns a single individual, in

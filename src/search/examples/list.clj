@@ -1,4 +1,4 @@
-; (ns search.examples.list)
+(ns search.examples.list)
 ;
 ; (defn score [ind]
 ;   "count of the number of ones in the list"

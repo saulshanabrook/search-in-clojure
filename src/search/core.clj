@@ -13,9 +13,8 @@
 
   ((:record-config! recorder) config)
 
-  (def run (run/config->run config))
-  ((:record-run! recorder) run)
-
-  (def generations (generation/run->generations run))
-  (doseq [generation generations] ((:record-generation! recorder) generation))
-  ((:record-run-done! recorder) run))
+  (let [run (run/config->run config)]
+    ((:record-run! recorder) run)
+    (let [generations (generation/run->generations run)]
+      (doseq [generation generations] ((:record-generation! recorder) generation))
+      ((:record-run-done! recorder) run))))

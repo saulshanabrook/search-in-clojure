@@ -11,10 +11,10 @@
             [search.config.evaluate :refer [->require]]))
 
 
-(defn record-config! [config])
-(defn record-run! [run])
-(defn record-generation! [generation])
-(defn record-run-done! [run])
+(defn record-config! [_])
+(defn record-run! [_])
+(defn record-generation! [_])
+(defn record-run-done! [_])
 
 (def sample-generation (g/generate schemas/Generation))
 (defn sample-algorithm
@@ -39,12 +39,10 @@
       (testing "record-generation!"
         (conjure/verify-call-times-for record-generation! 1)
         (verify-first-call-args-for-p record-generation! #(not (clojure.string/blank? (:run-id %))))
-        (let [strip-run-id #(dissoc % :run-id)]
-          (print (dissoc sample-generation :run-id))
-          (verify-first-call-args-for-p record-generation! #(=
-                                                             (dissoc sample-generation :run-id)
-                                                             (dissoc % :run-id)))))
+        (verify-first-call-args-for-p record-generation! #(=
+                                                           (dissoc sample-generation :run-id)
+                                                           (dissoc % :run-id))))
       (testing "record-run-done!"
         (conjure/verify-call-times-for record-run-done! 1)
         (verify-first-call-args-for-p record-run-done! #(= config_ (:config %)))
-        (verify-first-call-args-for-p record-run-done! #(not (clojure.string/blank? (:id %))))))))                                            
+        (verify-first-call-args-for-p record-run-done! #(not (clojure.string/blank? (:id %))))))))
