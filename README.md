@@ -2,7 +2,10 @@
 
 A Clojure framework for [metaheauristc search algorithms](https://en.wikipedia.org/wiki/Metaheuristic).
 
-Goals:
+
+## Terms
+
+* Goals:
 
 * Idiomatic Clojure
   * Pure functions as much as possible
