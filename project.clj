@@ -18,8 +18,7 @@
                              [lein-cloverage "1.0.6"]
                              [lein-codox "0.9.4"]]}}
   :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
-            "slamhound" ["run" "-m" "slam.hound"]
-            "deps" ["ancient"]}
+            "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]}
   :codox {:src-dir-uri "http://github.com/saulshanabrook/push-in-clojure/blob/master/"
