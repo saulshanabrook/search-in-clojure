@@ -22,14 +22,14 @@
 
 (defn some-test-fn [arg] arg)
 (st/deftest call-test
-  (let [_call (evaluate/->call (list 'search.config.evaluate-test/some-test-fn :dog))]
+  (let [_call (evaluate/->call 'search.config.evaluate-test/some-test-fn :dog)]
     (is (= :dog (evaluate/evaluate (->config) _call)))
     (testing "recursively-evaluate"
       (is (= :dog (evaluate/recursively-evaluate (->config) _call))))))
 
 (st/deftest get-in-config-test
   (let [_config (->config {:first {:second :final-value}})
-        _get-in-config (evaluate/->get-in-config (list :first :second))]
+        _get-in-config (evaluate/->get-in-config :first :second)]
     (is (= :final-value (evaluate/evaluate _config _get-in-config)))
     (testing "recursively-evaluate"
       (is (= :final-value

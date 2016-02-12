@@ -1,6 +1,7 @@
 (ns search.config.evaluate
   (:require [schema.core :as s]
-            [search.config.schemas :refer [Config]]))
+            [search.config.schemas :refer [Config]]
+            [slingshot.slingshot :refer [throw+]]))
 
 (s/defschema ShouldEvaluate {:should-evaluate-type s/Keyword
                              :input s/Any})
@@ -32,7 +33,10 @@
   "Takes in a symbol like 'my.project/function and returns
   the value that the symbol refers to."
   [s :- s/Symbol]
-  (-> s namespace symbol require)
+  (let [namespace_ (namespace s)]
+    (if namespace_
+      (-> namespace_ symbol require)
+      (throw+ {:type ::no-namespace :symbol s :hint "Couldn't evaluate this symbol, should be like `project/function`"})))
   (eval s))
 
 
@@ -43,7 +47,9 @@
         f-args-evaled (recursively-evaluate config f-args)]
     (apply f f-args-evaled)))
 
-(def ->call (partial ->should-evaluate :call))
+(defn ->call
+  [& args]
+  (->should-evaluate :call args))
 
 (s/defmethod evaluate :require
   [_ {symbol :input} :- (assoc ShouldEvaluate :input s/Symbol)]
@@ -53,5 +59,11 @@
 (s/defmethod evaluate :get-in-config
   [config :- Config
    {ks :input} :- (assoc ShouldEvaluate :input [s/Keyword])]
+  (let [value (get-in config ks)]
+    (if (nil? value)
+      (throw+ {:type ::get-in-config-path :ks ks :hint "Couldnt get this path in the config"})))
+
   (recursively-evaluate config (get-in config ks)))
-(def ->get-in-config (partial ->should-evaluate :get-in-config))
+(defn ->get-in-config
+  [& args]
+  (->should-evaluate :get-in-config args))

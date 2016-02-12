@@ -35,7 +35,7 @@ the algorithm, like:
   * For debug
   * multiple metrics per individual
     * resource consumption (time/memory/cpu)
-    * might have multiple objectives and scores
+    * might have multiple traits and scores
     * metrics not used to guide reproduction but just for information
       (reproductive fitness)
   * To see how well it does

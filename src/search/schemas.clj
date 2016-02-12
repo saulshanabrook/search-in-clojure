@@ -13,11 +13,11 @@
           :id s/Str})
 
 (def Genome s/Any)
-(def Objectives {s/Keyword s/Num})
+(def Traits {s/Keyword s/Num})
 
 (def Individual {:genome Genome
                  :id s/Str
-                 :objectives Objectives
+                 :traits Traits
                  :parents-ids [s/Str]})
 
 (def Generation {:run-id s/Str

@@ -12,5 +12,5 @@
             :individuals [{:genome 1
                            :parent-ids []
                            :id (utils/id)
-                           :objectives {}}]})
+                           :traits {}}]})
    (range 10)))
