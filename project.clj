@@ -3,7 +3,7 @@
   :url "http://github.com/saulshanabrook/search-in-clojure"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.generators "0.1.2"]
                  [prismatic/schema "1.0.4"]
                  [com.taoensso/timbre "4.2.1"]
