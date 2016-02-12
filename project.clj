@@ -24,6 +24,6 @@
             "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]}
-  :codox {:src-dir-uri "http://github.com/saulshanabrook/push-in-clojure/blob/master/"
-          :src-linenum-anchor-prefix "L"
-          :defaults {:doc/format :markdown}})
+  :codox {:source-uri "http://github.com/saulshanabrook/search-in-clojure/blob/master/{filepath}#L{line}"
+          :output-path "doc"
+          :metadata {:doc/format :markdown}})
