@@ -26,4 +26,8 @@
              :exclude-namespaces [search.conjure-utils]}
   :codox {:source-uri "http://github.com/saulshanabrook/search-in-clojure/blob/master/{filepath}#L{line}"
           :output-path "doc"
-          :metadata {:doc/format :markdown}})
+          :metadata {:doc/format :markdown}}
+  :hiera {:cluster-depth 2
+          :trim-ns-prefix true
+          :path "docs/ns-hierarchy.png"})
+          ; :ignore-ns #{}})
