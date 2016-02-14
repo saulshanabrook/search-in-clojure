@@ -16,3 +16,15 @@
       (if (pred (first s))
         (cons (first s) nil)
         (cons (first s) (take-until pred (rest s)))))))
+
+(defmacro value->symbol
+  "Takes any value and return the symbol to it, including it's namespace
+
+  Note: You can't use this in a funciton on one of it's arguments. If
+  `(var v)` will fail in your context then `(value->symbol v)` will also fail.
+  See http://stackoverflow.com/questions/11856517/how-to-get-name-of-argument-in-clojure"
+  [v]
+  `(let [m# (meta (var ~v))]
+    (symbol
+     (name (ns-name (:ns m#)))
+     (name (:name m#)))))

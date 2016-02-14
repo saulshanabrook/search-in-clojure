@@ -46,3 +46,17 @@
         (conjure/verify-call-times-for record-run-done! 1)
         (verify-first-call-args-for-p record-run-done! #(= config_ (:config %)))
         (verify-first-call-args-for-p record-run-done! #(not (clojure.string/blank? (:id %))))))))
+
+
+(st/deftest run->generations-test
+  (let [config_ (config/->config {:algorithm
+                                  (->require 'search.core-test/sample-algorithm)})
+        run_ (search/config->run config_)
+        generations_ (search/run->generations run_)]
+    (is (= [(assoc sample-generation :run-id (:id run_))] generations_))))
+
+(st/deftest config->run-test
+  (let [config_ (config/->config)
+        run_ (search/config->run config_)]
+    (is (= (:config run_) config_))
+    (is ((comp not clojure.string/blank?) (:id run_)))))
