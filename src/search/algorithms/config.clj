@@ -3,7 +3,7 @@
 
 
 (def hill-climb-algorithm (->call
-                            'search.algorithms.hill-climb/algorithm
+                            'search.algorithms.hill-climb/->algorithm
                             (->get-in-config :problem :new-genome)
                             (->get-in-config :problem :mutate)
                             (->get-in-config :problem :evaluate)
