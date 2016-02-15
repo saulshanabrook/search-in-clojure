@@ -13,22 +13,33 @@
           :id s/Str})
 
 (def Genome s/Any)
-(def Traits {s/Keyword s/Num})
+(def Traits
+  "Traits are any information we want to know about an indivual. For single
+  objective search we commonly use a `:value` trait."
+  {s/Keyword s/Num})
 
-(def Individual {:genome Genome
-                 :id s/Str
-                 :traits Traits
-                 :parents-ids [s/Str]})
+(def Individual
+  {:genome Genome
+   :id s/Str
+   :traits Traits
+   :parents-ids [s/Str]})
 
-(def Generation {:run-id s/Str
-                 :index s/Int
-                 :individuals [Individual]})
+(def Generation
+  "Holds the whole state for a current generation of individuals."
+  {:run-id s/Str
+   :index s/Int
+   :individuals [Individual]})
 
-(def Algorithm (s/=> [Generation] s/Str))
+(def Algorithm
+  "Takes in a run id and returns a sequence of generations. This is where
+  all the interesting things happen."
+  (s/=> [Generation] s/Str))
 
 ; A Recorder is responsible for displaying or saving the resaults of an
 ; execution.
-(def Recorder {:record-config! (s/=> Config [])
-               :record-run! (s/=> Run [])
-               :record-generation! (s/=> Generation [])
-               :record-run-done! (s/=> Run [])})
+(def Recorder
+  "responsible for displaying or saving the resaults of an execution."
+  {:record-config! (s/=> Config [])
+   :record-run! (s/=> Run [])
+   :record-generation! (s/=> Generation [])
+   :record-run-done! (s/=> Run [])})
