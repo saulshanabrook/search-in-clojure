@@ -2,8 +2,12 @@
   (:require [schema.core :as s]
 
             [search.schemas :as schemas]
-            [search.algorithms.base.schemas :refer [Initial Evaluate Done Step]]
             [search.utils :as utils]))
+
+(def Initial (s/=> s/Str schemas/Generation))
+(def Evaluate (s/=> schemas/Generation schemas/Generation))
+(def Done (s/=> schemas/Generation s/Bool))
+(def Step (s/=> schemas/Generation schemas/Generation))
 
 (s/defn ->algorithm :- schemas/Algorithm
   "Basic high level algorithm that will cover most use cases.

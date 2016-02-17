@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
 
             [search.schemas :as schemas]
-            [search.algorithms.base.schemas :refer [Initial]]
+            [search.algorithms.base.core :refer [Initial]]
             [search.utils :as utils]))
 
 (s/defn ->genome-> :- Initial

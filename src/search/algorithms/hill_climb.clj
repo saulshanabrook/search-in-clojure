@@ -2,10 +2,10 @@
   (:require [schema.core :as s]
 
             [search.schemas :as schemas]
-            [search.algorithms.base.schemas :refer [Done]]
             [search.algorithms.base.core :as base]
             [search.algorithms.base.initial :as initial]
             [search.algorithms.base.step :as step]
+            [search.algorithms.base.tweak :as tweak]
             [search.algorithms.base.evaluate :as evaluate]))
 
 
@@ -14,7 +14,7 @@
   [->genome :- (s/=> schemas/Genome)
    mutate :- (s/=> schemas/Genome schemas/Genome)
    evaluate :- (s/=> schemas/Genome s/Num)
-   done? :- Done]
+   done? :- base/Done]
   (base/->algorithm
     (initial/->genome-> ->genome 1)
     (evaluate/genome->traits-> #(hash-map :value (evaluate %)))
@@ -27,4 +27,4 @@
                             new-score (evaluate new-genome)
                             new-is-better? (>= new-score old-score)
                             child-genome (if new-is-better? new-genome old-genome)]
-                        (step/->child-individual child-genome [parent]))))))
+                        (tweak/->child-individual child-genome [parent]))))))

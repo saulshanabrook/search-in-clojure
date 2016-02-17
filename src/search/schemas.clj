@@ -16,7 +16,7 @@
 (def Traits
   "Traits are any information we want to know about an indivual. For single
   objective search we commonly use a `:value` trait."
-  {s/Keyword s/Num})
+  {s/Keyword s/Int})
 
 (def Individual
   {:genome Genome

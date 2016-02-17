@@ -3,7 +3,7 @@
             [com.rpl.specter :as sp]
 
             [search.schemas :as schemas]
-            [search.algorithms.base.schemas :refer [Done]]))
+            [search.algorithms.base.core :refer [Done]]))
 
 
 (s/defn max-generations-> :- Done

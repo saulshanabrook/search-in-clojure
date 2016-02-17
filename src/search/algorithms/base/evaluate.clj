@@ -3,7 +3,7 @@
             [com.rpl.specter :as sp]
 
             [search.schemas :as schemas]
-            [search.algorithms.base.schemas :refer [Evaluate]]))
+            [search.algorithms.base.core :refer [Evaluate]]))
 
 (s/defn genome->traits-> :- Evaluate
   "Returns an evaluate function that generates the traits for each individual
