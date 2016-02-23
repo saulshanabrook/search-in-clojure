@@ -1,7 +1,5 @@
 (ns search.examples.list
-  (:require [search.core]
-            [search.config.core :as config]
-            [search.recorders.text]
+  (:require [search.config.core :as config]
             [search.config.evaluate :refer [->require ->call]]))
 
 
@@ -34,7 +32,3 @@
                         :mutate (->require 'search.examples.list/mutate)
                         :evaluate (->require 'search.examples.list/score)
                         :done (->call 'search.algorithms.base/done?-max-trait :value 10)}}))
-(def recorder search.recorders.text/timbre)
-
-(defn -main []
-  (search.core/execute recorder config))

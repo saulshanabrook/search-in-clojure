@@ -1,5 +1,7 @@
 (ns search.utils
-  (:require [clj-uuid :as uuid]))
+  (:require [schema.core :as s]
+            [clj-uuid :as uuid]
+            [clojure.data.generators]))
 
 (defn id [] (uuid/to-string (uuid/v1)))
 
@@ -28,3 +30,12 @@
     (symbol
      (name (ns-name (:ns m#)))
      (name (:name m#)))))
+
+
+
+(def Probability (s/constrained s/Num #(<= 0 % 1)))
+
+(s/defn rand-true? :- s/Bool
+ "Returns `true` with probability `p` and `false` with probability `1-p`"
+ [p :- Probability]
+ (<= (clojure.data.generators/float) p))
