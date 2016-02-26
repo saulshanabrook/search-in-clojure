@@ -7,6 +7,15 @@ A Clojure framework for [metaheauristc search algorithms](https://en.wikipedia.o
 
 ![ns graph](/docs/ns-hierarchy.png?raw=true)
 
+This README is not complete yet and the bottom is out of date.
+
+## Quickstart
+
+```bash
+lein run search.recorders.text/timbre search.examples.list/hill-climb-config
+```
+
+
 ## Design
 It is easiest to understand the design decisions of this project in the context
 of the initial goals/requirements.
