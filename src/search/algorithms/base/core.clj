@@ -1,29 +1,24 @@
 (ns search.algorithms.base.core
   (:require [schema.core :as s]
+            [plumbing.core :refer [defnk]]
 
-            [search.schemas :as schemas]
+            [search.core :as search]
             [search.utils :as utils]))
 
-(def Initial (s/=> s/Str schemas/Generation))
-(def Evaluate (s/=> schemas/Generation schemas/Generation))
-(def Done (s/=> schemas/Generation s/Bool))
-(def Step (s/=> schemas/Generation schemas/Generation))
-
-(s/defn ->algorithm :- schemas/Algorithm
+(defnk generations ; :- (possibly infinite) lazy [search/Generation]
   "Basic high level algorithm that will cover most use cases.
 
-  1. Call `initial` with the run ID to get the intial generation.
+  1. Gets the initial generation from `initial`.
   2. Call `evaluate` on the current generation, which should return
      a generation whose `:individuals` have updated `traits`
   3. Check current generation is `done?`:
-    1. If yes then return the currnent generation
+    1. If yes then return the current generation
     2. If no, then recur with a new generation, from `step`,
        to step 2."
-  [initial :- Initial
-   evaluate :- Evaluate
-   done? :- Done
-   step :- Step]
-  (s/fn step-until-end-inner [run-id :- s/Str]
-    (utils/take-until
-     done?
-     (iterate (comp evaluate step) (-> run-id initial evaluate)))))
+  [initial :- search/Generation
+   evaluate :- (s/=> search/Generation search/Generation)
+   done? :- (s/=> search/Generation s/Bool)
+   step :- (s/=> search/Generation search/Generation)]
+  (utils/take-until
+    done?
+    (iterate (comp evaluate step) (evaluate initial))))

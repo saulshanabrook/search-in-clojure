@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.generators "0.1.2"]
                  [prismatic/schema "1.0.4"]
+                 [prismatic/plumbing "0.5.2"]
                  [com.taoensso/timbre "4.2.1"]
                  [org.clojure/test.check "0.9.0"]
                  [danlentz/clj-uuid "0.1.6"]

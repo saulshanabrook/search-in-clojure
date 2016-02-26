@@ -1,7 +1,9 @@
 (ns search.algorithms.genetic
   (:require [schema.core :as s]
+            [plumbing.graph :as g]
+            [plumbing.core :refer [fnk]]
 
-            [search.schemas :as schemas]
+            [search.core :as search]
             [search.algorithms.base.core :as base]
             [search.algorithms.base.initial :as initial]
             [search.algorithms.base.step :as step]
@@ -9,16 +11,12 @@
             [search.algorithms.base.evaluate :as evaluate]))
 
 
-(s/defn ->algorithm :- schemas/Algorithm
+(def graph
   "Genetic algorithm"
-  [->genome :- (s/=> schemas/Genome)
-   population-size :- s/Int
-   evaluate :- (s/=> schemas/Traits schemas/Genome)
-   done? :- base/Done
-   select :- step/Select
-   tweak :- step/Tweak]
-  (base/->algorithm
-    (initial/->genome-> ->genome population-size)
-    (evaluate/genome->traits-> evaluate)
-    done?
-    (step/breed-> (step/select-and-tweak->breed select tweak))))
+  (g/graph
+    :n (fnk [population-size] population-size)
+    :initial initial/->genome
+    :evaluate evaluate/genome->traits
+    :breed step/select-and-tweak
+    :step step/breed
+    :generations base/generations))

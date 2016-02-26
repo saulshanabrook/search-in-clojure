@@ -4,20 +4,20 @@
             [schema.experimental.generators :as g]
             [com.rpl.specter :as sp]
 
-            [search.schemas :as schemas]
+            [search.core :as search]
             [search.algorithms.base.tweak :as tweak]))
 (use-fixtures :once schema.test/validate-schemas)
 
-(deftest tweak-genome->-test
+(deftest tweak-genome-test
   (let [tweak-genome (fn tweak-genome-fn
                       ; breeds two parents, by creating two children, one with
                       ; the sum of their parents and one with the product
-                      [parents]
-                      [(apply #'+ parents)
-                       (apply #'* parents)])
-        n-parents 2
-        tweak_ (tweak/tweak-genome-> tweak-genome n-parents)
-        ->individual #(assoc (g/generate schemas/Individual) :genome %)
+                      [first second]
+                      [(+ first second)
+                       (* first second)])
+        tweak_ (tweak/tweak-genome {:f tweak-genome
+                                    :n-parents 2})
+        ->individual #(assoc (g/generate search/Individual) :genome %)
         first-parent (->individual 3)
         second-parent (->individual 4)
         parents [first-parent second-parent]

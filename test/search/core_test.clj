@@ -3,12 +3,10 @@
             [conjure.core :as conjure]
             [search.conjure-utils :refer [verify-first-call-args-for-p]]
             [schema.test :as st]
+            [plumbing.core :refer [fnk]]
             [schema.experimental.generators :as g]
 
-            [search.core :as search]
-            [search.schemas :as schemas]
-            [search.config.core :as config]
-            [search.config.evaluate :refer [->require]]))
+            [search.core :as search]))
 
 
 (defn record-config! [_])
@@ -16,10 +14,8 @@
 (defn record-generation! [_])
 (defn record-run-done! [_])
 
-(def sample-generation (g/generate schemas/Generation))
-(defn sample-algorithm
-  [run_id]
-  [(assoc sample-generation :run-id run_id)])
+(def sample-generation (g/generate search/Generation))
+(def sample-graph {:generations (fnk [run-id] [(assoc sample-generation :run-id run-id)])})
 
 (st/deftest execute-test
   (conjure/instrumenting [record-config! record-run! record-generation! record-run-done!]
@@ -27,8 +23,7 @@
                      :record-run! record-run!
                      :record-generation! record-generation!
                      :record-run-done! record-run-done!}
-          config_ (config/->config {:algorithm
-                                    (->require 'search.core-test/sample-algorithm)})]
+          config_ (search/->config ['search.core-test/sample-graph])]
       (search/execute recorder_ config_)
       (testing "record-config!"
         (conjure/verify-called-once-with-args record-config! config_))
@@ -49,14 +44,13 @@
 
 
 (st/deftest run->generations-test
-  (let [config_ (config/->config {:algorithm
-                                  (->require 'search.core-test/sample-algorithm)})
+  (let [config_ (search/->config ['search.core-test/sample-graph])
         run_ (search/config->run config_)
         generations_ (search/run->generations run_)]
     (is (= [(assoc sample-generation :run-id (:id run_))] generations_))))
 
 (st/deftest config->run-test
-  (let [config_ (config/->config)
+  (let [config_ (search/->config ['search.core-test/sample-graph])
         run_ (search/config->run config_)]
     (is (= (:config run_) config_))
     (is ((comp not clojure.string/blank?) (:id run_)))))

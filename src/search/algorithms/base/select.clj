@@ -1,21 +1,21 @@
 (ns search.algorithms.base.select
   (:require [schema.core :as s]
             [clojure.data.generators]
+            [plumbing.graph :as g]
 
-            [search.schemas :as schemas]
-            [search.algorithms.base.step :refer [Select]]))
+            [search.core :as search]
+            [search.utils :refer [defnk-fn]]))
 
-(s/defn roulette :- Select
-  "Select individuals proportional to their fitness. If an individual has a
-  higher fitness it is selected more often. `fitness-trait` is the name of the
-  trait to use as the fitness.
+(defnk-fn roulette :- search/Individual
+  "Select a parent individual, proportional to the `trait-name` trait of the
+  of individual. A higher value will cause the individual to be selected more
+  often.
 
   This is a single objective selection."
-  [fitness-trait :- s/Keyword]
-  (s/fn roulette-inner :- schemas/Individual
-    [inds :- [schemas/Individual]]
-    (->>
-      inds
-      (map #(vector %1 (get-in %1 [:traits fitness-trait])))
-      (into {})
-      clojure.data.generators/weighted)))
+  [trait-name :- s/Keyword]
+  [inds :- [search/Individual]]
+  (->>
+    inds
+    (map #(vector %1 (get-in %1 [:traits trait-name])))
+    (into {})
+    clojure.data.generators/weighted))

@@ -4,23 +4,22 @@
             [schema.experimental.generators :as g]
             [conjure.core :as conjure]
 
-            [search.schemas :as schemas]
+            [search.core :as search]
             [search.algorithms.base.core :as base]))
 (use-fixtures :once schema.test/validate-schemas)
 
 ; defined globally so that instrumenting works on it
 (defn step_ [gen] (update-in gen [:index] inc))
-(deftest ->algorithm-test
+(deftest generations-graph-test
   (conjure/instrumenting [step_]
-    (let [initial-ind (-> schemas/Individual g/generate (assoc :traits {:value 0}))
-          initial #(-> schemas/Generation g/generate (assoc :run-id %
-                                                            :index 0
-                                                            :individuals [initial-ind]))
-          done? #(= 9 (:index %))
+    (let [initial-ind (-> search/Individual g/generate (assoc :traits {:value 0}))
+          initial (-> search/Generation g/generate (assoc :index 0
+                                                          :individuals [initial-ind]))
           value-path [:individuals 0 :traits :value]
-          evaluate #(update-in % value-path inc)
-          algorithm (base/->algorithm initial evaluate done? step_)
-          generations (algorithm "_")]
+          generations (base/generations {:initial initial
+                                         :evaluate #(update-in % value-path inc)
+                                         :done? #(= 9 (:index %))
+                                         :step step_})]
       (conjure/verify-call-times-for step_ 0)
 
       (let [generation (first generations)]

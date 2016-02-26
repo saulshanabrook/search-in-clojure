@@ -2,24 +2,19 @@
   (:require [schema.core :as s]
             [clojure.data.generators]
 
-            [search.algorithms.base.step :refer [Tweak]]
-            [search.algorithms.base.tweak :refer [TweakGenome tweak-genome->]]
-            [search.algorithms.seq.schemas :refer [SeqGene SeqGenome]]
-            [search.utils :as utils]))
+            [search.utils :refer [defnk-fn] :as utils]))
 
-(s/defn mutate :- TweakGenome
+
+(def SeqGene s/Any)
+(def SeqGenome [SeqGene])
+
+(defnk-fn mutate :- [SeqGenome]
   "Replaces each gene in the genome with probability `prob`, creating a new
   gene with `->gene` if needed."
-  [prob :- utils/Probability
+  [p :- utils/Probability
    ->gene :- (s/=> SeqGene)]
-  (s/fn seq-mutate-inner :- [SeqGenome]
-    [[genome] :- [SeqGenome]]
-    [(map #(if (utils/rand-true? prob) (->gene) %) genome)]))
-
-(defn mutate-tweak
-  "Returns a tweak, passing all args to the `mutate` function."
-  [& args]
-  (tweak-genome-> (apply mutate args) 1))
+  [genome :- SeqGenome]
+  [(map #(if (utils/rand-true? p) (->gene) %) genome)])
 
 (s/defn length-within :- s/Int
   "Given a number of sequences, returns a random length that is less than all
@@ -33,16 +28,12 @@
 (s/defn one-point-crossover :- [SeqGenome]
   "Creates two new children from `first_` and `second_` by chosing a point and
    swapping all elements before and after that point."
-  [genomes :- [(s/one SeqGenome "first") (s/one SeqGenome "second")]]
-  (let [split-length (length-within genomes)
-        [first-split second-split] (map (partial split-at split-length) genomes)]
+  [first_ :- SeqGenome
+   second_ :- SeqGenome]
+  (let [split-length (length-within [first_ second_])
+        [first-split second-split] (map (partial split-at split-length) [first_ second_])]
     [(concat (first first-split) (second second-split))
      (concat (first second-split) (second first-split))]))
-
-(defn one-point-crossover-tweak
- "Returns a tweak, passing all args to the `one-point-crossover` function."
- [& args]
- (tweak-genome-> (apply one-point-crossover args) 2))
 
 ; (s/defn alternation
 ;   "Merges two sequences, taking sequential items from one then crossing over and

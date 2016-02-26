@@ -8,12 +8,10 @@
 (use-fixtures :once schema.test/validate-schemas)
 
 
-(deftest ->genome->-test
-  (let [->genome (fn [] :test)
-        n 10
-        ->initial (initial/->genome-> ->genome n)
-        id_ "_"
-        run-id "_"]
+(deftest ->genome-test
+  (let [n 10
+        run-id "_"
+        id_ "_"]
     (conjure/stubbing [utils/id id_]
       (is (=
            {:index 0
@@ -22,4 +20,6 @@
                                     :id id_
                                     :parents-ids []
                                     :traits {}})}
-           (->initial run-id))))))
+           (initial/->genome {:->genome (fn [] :test)
+                              :n n
+                              :run-id run-id}))))))
