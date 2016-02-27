@@ -8,13 +8,13 @@
             [search.algorithms.base.step :as step]))
 (use-fixtures :once schema.test/validate-schemas)
 
-(deftest breed-test
+(deftest breed->-test
   (let [n 10
         individual #(g/generate search/Individual)
 
         ; breed function creates new individuals that are all
         ; the first individual from the last generation
-        step (step/breed {:n n :breed #(-> % :individuals first repeat)})
+        step (step/breed-> {:n n :breed #(-> % :individuals first repeat)})
         generation (->
                     search/Generation
                     g/generate

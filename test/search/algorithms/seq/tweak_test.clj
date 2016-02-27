@@ -3,7 +3,6 @@
             [schema.core :as s]
             [schema.test]
 
-            [search.core :as search]
             [search.algorithms.seq.tweak :as tweak]))
 (use-fixtures :once schema.test/validate-schemas)
 

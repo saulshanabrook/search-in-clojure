@@ -25,7 +25,7 @@
 (s/defn individual :- Genome
   "a new random list of 1s and 0s"
   []
-  (into [] (repeatedly 10 binary)))
+  (vec (repeatedly 10 binary)))
 
 (s/defn mutate :- Genome
   "changes a random index of the list to a 0|1"

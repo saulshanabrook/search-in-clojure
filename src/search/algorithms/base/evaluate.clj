@@ -5,7 +5,7 @@
             [search.core :as search]
             [search.utils :refer [defnk-fn]]))
 
-(defnk-fn genome->traits :- search/Generation
+(defnk-fn genome->traits-> :- search/Generation
   "Return an evaluated generation by settings the traits for each individual
    based on its genome"
   [genome->traits :- (s/=> search/Traits search/Genome)]

@@ -1,18 +1,17 @@
 (ns search.algorithms.base.step
   (:require [schema.core :as s]
-            [plumbing.graph :as g]
 
             [search.utils :refer [defnk-fn]]
             [search.core :as search]))
 
-(defnk-fn breed :- search/Generation
+(defnk-fn breed-> :- search/Generation
   "Step to the next generation by taking the first `n` individuals from calling
   `breed` on the current generation."
   [n :- s/Int
    breed :- (s/=> [search/Individual] search/Generation)]
   [generation :- search/Generation]
-  {:index (inc (:index generation))
-   :run-id (:run-id generation)
+  {:index       (inc (:index generation))
+   :run-id      (:run-id generation)
    :individuals (take n (breed generation))})
 
 (defnk-fn select-and-tweak :- s/Any ;- lazy infinite [search/Individual]

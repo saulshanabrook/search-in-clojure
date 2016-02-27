@@ -24,6 +24,8 @@
 (deftest symbol->value-test
   (is (= :test-val (utils/symbol->value 'search.utils-test/require-sample))))
 
+
+(utils/defnk-fn test-fn :- s/Int "test" [a] [b] (+ a b))
 (deftest defnk-fn-test
   (let [macro-form `(utils/defnk-fn ~'hi :- [s/Int]
                        "description"
@@ -43,5 +45,4 @@
     ; `(fnk [a] (s/fn [b] [a b])) '(utils/defnk-fn [a] [b] [a b])
     ; `(fnk hi [] (s/fn hi-inner [] :value)) '(utils/defnk-fn hi [] [] :value)
     ; `(fnk hi [] (s/fn hi-inner :- return-schema [] :value)) '(utils/defnk-fn hi :- return-schema [] [] :value))
-  (utils/defnk-fn test-fn :- s/Int "test" [a] [b] (+ a b))
   (is (= 3 ((test-fn {:a 1}) 2))))

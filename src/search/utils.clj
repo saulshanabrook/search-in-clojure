@@ -1,6 +1,5 @@
 (ns search.utils
   (:require [schema.core :as s]
-            [plumbing.core :refer [defnk]]
             [clj-uuid :as uuid]
             [clojure.edn :as edn]
             [clojure.data.generators]
@@ -88,7 +87,7 @@
   [name _ return-schema doc-string outer-args inner-args body]
   (let [inner-fnc-dummy (eval `(s/fn _ :- ~return-schema ~inner-args nil))
         inner-fnc-schema (s/fn-schema inner-fnc-dummy)]
-    `(defnk ~name :- ~inner-fnc-schema
+    `(plumbing.core/defnk ~name :- ~inner-fnc-schema
       ~doc-string
       ~outer-args
       (s/fn ~(symbol-append name "-inner") :- ~return-schema

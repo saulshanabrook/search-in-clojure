@@ -25,7 +25,9 @@
   :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
             "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
-             :exclude-namespaces [search.conjure-utils]}
+             :exclude-namespaces [search.conjure-utils]
+            ;  :config-files ["eastwood.clj"]
+             :exclude-linters [:unused-locals]}
   :codox {:source-uri "http://github.com/saulshanabrook/search-in-clojure/blob/master/{filepath}#L{line}"
           :output-path "doc"
           :metadata {:doc/format :markdown}}

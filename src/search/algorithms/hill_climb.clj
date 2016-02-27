@@ -29,9 +29,9 @@
 (def graph
   "[Hill climbing](https://en.wikipedia.org/wiki/Hill_climbing) algorithm."
   (g/graph
-    :initial (g/instance initial/->genome {:n 1})
+    :initial (g/instance initial/->genome-> {:n 1})
     :genome->traits (fnk [genome->value] #(hash-map :value (genome->value %)))
-    :evaluate evaluate/genome->traits
+    :evaluate evaluate/genome->traits->
     :breed breed
-    :step  (g/instance step/breed {:n 1})
+    :step  (g/instance step/breed-> {:n 1})
     :generations (g/instance base/generations {:n 1})))

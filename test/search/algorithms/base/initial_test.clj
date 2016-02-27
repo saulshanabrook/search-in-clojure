@@ -20,6 +20,6 @@
                                     :id id_
                                     :parents-ids []
                                     :traits {}})}
-           (initial/->genome {:->genome (fn [] :test)
-                              :n n
-                              :run-id run-id}))))))
+           (initial/->genome-> {:->genome (fn [] :test)
+                              :n          n
+                              :run-id     run-id}))))))

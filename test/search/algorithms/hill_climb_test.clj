@@ -2,8 +2,6 @@
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
-            [plumbing.graph :as g]
-            [plumbing.core :refer [fnk]]
 
             [search.core :as search]
             [search.algorithms.test-utils :refer [is-algorithm]]

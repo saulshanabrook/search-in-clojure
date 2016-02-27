@@ -8,13 +8,13 @@
             [search.algorithms.base.evaluate :as evaluate]))
 (use-fixtures :once schema.test/validate-schemas)
 
-(deftest genome->traits-test
+(deftest genome->traits->-test
   (let [genomes [[1, 2, 3],
                  [1, 2, 3, 4]]
         ind-with-genome #(-> search/Individual g/generate (assoc :genome %))
         generation (-> search/Generation g/generate (assoc :individuals (map ind-with-genome genomes)))
 
         genome->traits #(hash-map :value (count %))
-        evaluated-generation ((evaluate/genome->traits {:genome->traits genome->traits}) generation)
+        evaluated-generation ((evaluate/genome->traits-> {:genome->traits genome->traits}) generation)
         values  (sp/select [:individuals sp/ALL :traits :value] evaluated-generation)]
     (is (= [3, 4] values))))

@@ -1,6 +1,5 @@
 (ns search.algorithms.test-utils
   (:require [clojure.test :refer [is]]
-            [schema.core :as s]
             [plumbing.fnk.pfnk]
             [plumbing.fnk.schema]))
 

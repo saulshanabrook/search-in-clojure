@@ -2,7 +2,6 @@
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
-            [com.rpl.specter :as sp]
 
             [search.core :as search]
             [search.algorithms.base.tweak :as tweak]))

@@ -1,7 +1,6 @@
 (ns search.algorithms.base.select
   (:require [schema.core :as s]
             [clojure.data.generators]
-            [plumbing.graph :as g]
 
             [search.core :as search]
             [search.utils :refer [defnk-fn]]))
