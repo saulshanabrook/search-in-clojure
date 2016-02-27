@@ -12,10 +12,14 @@
           :id s/Str})
 
 (def Genome s/Any)
+
+(def TraitKey s/Keyword)
+(def TraitValue s/Int)
+
 (def Traits
   "Traits are any information we want to know about an indivual. For single
   objective search we commonly use a `:value` trait."
-  {s/Keyword s/Int})
+  {TraitKey TraitValue})
 
 (def Individual
   {:genome Genome

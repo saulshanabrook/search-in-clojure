@@ -14,7 +14,7 @@
 (def graph
   "Genetic algorithm"
   (g/graph
-    :n (fnk [population-size] population-size)
+    :n (fnk [population-size :- s/Int] population-size)
     :initial initial/->genome
     :evaluate evaluate/genome->traits
     :breed step/select-and-tweak

@@ -15,7 +15,8 @@
 (defnk-fn breed :- [search/Individual]
   "Mutates the last individuals genome and stores the new copy if it has
    a higher value, and keeps the old if it is higher."
-  [genome->value mutate]
+  [genome->value :- (s/=> search/TraitValue search/Genome)
+   mutate :- (s/=> search/Genome search/Genome)]
   [{[parent] :individuals} :- search/Generation]
   (let [old-genome (:genome parent)
         new-genome (mutate old-genome)

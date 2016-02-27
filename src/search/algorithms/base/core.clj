@@ -17,7 +17,7 @@
        to step 2."
   [initial :- search/Generation
    evaluate :- (s/=> search/Generation search/Generation)
-   done? :- (s/=> search/Generation s/Bool)
+   done? :- (s/=> s/Bool)
    step :- (s/=> search/Generation search/Generation)]
   (utils/take-until
     done?
