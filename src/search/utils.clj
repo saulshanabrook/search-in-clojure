@@ -75,7 +75,7 @@
 
   expands to:
 
-    (defnk name
+    (defnk name :- (s/=> s/Int s/Any)
       \"the `name` function does a lot of great stuff\"
       [outer-input]
       (fn name-inner :- s/Int
@@ -86,12 +86,14 @@
     `<name> :- <return-schema> <doc-string> <outer-args> <inner-args> <body>`
   "
   [name _ return-schema doc-string outer-args inner-args body]
-  `(defnk ~name
-    ~doc-string
-    ~outer-args
-    (s/fn ~(symbol-append name "-inner") :- ~return-schema
-      ~inner-args
-      ~body)))
+  (let [inner-fnc-dummy (eval `(s/fn _ :- ~return-schema ~inner-args nil))
+        inner-fnc-schema (s/fn-schema inner-fnc-dummy)]
+    `(defnk ~name :- ~inner-fnc-schema
+      ~doc-string
+      ~outer-args
+      (s/fn ~(symbol-append name "-inner") :- ~return-schema
+        ~inner-args
+        ~body))))
 ;
 ; (defn fnk-rename-args
 ;   "Takes a fnk and a mapping of old argument names to new argument names.

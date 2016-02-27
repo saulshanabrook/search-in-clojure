@@ -28,15 +28,15 @@
   (let [macro-form `(utils/defnk-fn ~'hi :- [s/Int]
                        "description"
                        [~'a :- s/Int]
-                       [~'b :- s/Int]
-                       [~'a ~'b])
+                       [~'arg0 :- s/Int]
+                       [~'a ~'arg0])
         expanded (macroexpand-1 macro-form)
-        intended-expanded `(defnk ~'hi
+        intended-expanded `(defnk ~'hi :- ~(s/=> [s/Int] s/Int)
                             "description"
                             [~'a :- s/Int]
                             (s/fn ~'hi-inner :- [s/Int]
-                              [~'b :- s/Int]
-                              [~'a ~'b]))]
+                              [~'arg0 :- s/Int]
+                              [~'a ~'arg0]))]
     (is (= intended-expanded expanded)))
    ; (are [exp orig] (= exp (macroexpand-1 (macroexpand-1 orig))))
     ; `(fnk [] (s/fn [] :value)) '(utils/defnk-fn [] [] :value)
