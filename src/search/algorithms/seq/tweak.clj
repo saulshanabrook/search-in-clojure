@@ -2,18 +2,15 @@
   (:require [schema.core :as s]
             [clojure.data.generators]
 
+            [search.algorithms.seq.core :refer [Gene Genome]]
             [search.utils :refer [defnk-fn] :as utils]))
 
-
-(def SeqGene s/Any)
-(def SeqGenome [SeqGene])
-
-(defnk-fn mutate :- [SeqGenome]
+(defnk-fn mutate :- [Genome]
   "Replaces each gene in the genome with probability `prob`, creating a new
   gene with `->gene` if needed."
   [p :- utils/Probability
-   ->gene :- (s/=> SeqGene)]
-  [genome :- SeqGenome]
+   ->gene :- (s/=> Gene)]
+  [genome :- Genome]
   [(map #(if (utils/rand-true? p) (->gene) %) genome)])
 
 (s/defn length-within :- s/Int
@@ -25,11 +22,11 @@
       1
       (clojure.data.generators/uniform 1 max-length))))
 
-(s/defn one-point-crossover :- [SeqGenome]
+(s/defn one-point-crossover :- [Genome]
   "Creates two new children from `first_` and `second_` by chosing a point and
    swapping all elements before and after that point."
-  [first_ :- SeqGenome
-   second_ :- SeqGenome]
+  [first_ :- Genome
+   second_ :- Genome]
   (let [split-length (length-within [first_ second_])
         [first-split second-split] (map (partial split-at split-length) [first_ second_])]
     [(concat (first first-split) (second second-split))
@@ -42,7 +39,7 @@
 ;
 ;   It will stop when it tries to select an index passed the end of either sequence."
 ;   [prob :- utils/Probability
-;    [first_ second_] :- [(s/one s/SeqGenome "first") (s/one s/SeqGenome "second")]]
+;    [first_ second_] :- [(s/one s/Genome "first") (s/one s/Genome "second")]]
 ;   (let [switch? (partial weighted-bool prob)]
 ;     (loop [index 0
 ;            first_? True
