@@ -9,8 +9,11 @@
 
 (use-fixtures :once schema.test/validate-schemas)
 
+(deftest invert-list
+  (is (= [4 2 1] (select/invert-list [1 2 4]))))
+
 (deftest roulette-test
-  (let [select_ (select/roulette {:trait-name :value})
+  (let [select_ (select/roulette {:trait-name :value :lowest? false})
         ->individual #(assoc (g/generate search/Individual) :traits {:value %})
         bad_ind (->individual 1)
         good_ind (->individual 10000000)]

@@ -15,3 +15,10 @@
    :record-run! (fn [_] nil)
    :record-generation! #(->> % :individuals (map (comp :value :traits)) (apply max) println)
    :record-run-done! (fn [_] nil)})
+
+(s/def min-distance :- search/Recorder
+ "Prints the min `:distance` trait each generation on a newline."
+ {:record-config! (fn [_] nil)
+  :record-run! (fn [_] nil)
+  :record-generation! #(->> % :individuals (map (comp :distance :traits)) (apply min) println)
+  :record-run-done! (fn [_] nil)})

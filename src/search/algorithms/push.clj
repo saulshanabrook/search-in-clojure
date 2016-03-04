@@ -22,8 +22,8 @@
    output-stack :- s/Keyword
    step-limit :- s/Int]
   [program bindings :- {s/Keyword s/Any}]
-  (let [output (push/run interpreter program step-limit {:bindings bindings})]
-    (first (push/get-stack output-stack output))))
+  (let [output (push/run interpreter program step-limit :bindings bindings)]
+    (first (push/get-stack output output-stack))))
 
 
 (def graph

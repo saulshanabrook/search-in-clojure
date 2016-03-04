@@ -7,9 +7,9 @@
             [search.core :as search]))
 (use-fixtures :once schema.test/validate-schemas)
 
-; (deftest genetic-config-test
-;   (->
-;     ex-push-saul/genetic-config
-;     search/config->run
-;     search/run->generations
-;     doall))
+(deftest genetic-config-test
+  (->
+    ex-push-saul/genetic-config
+    search/config->run
+    search/run->generations
+    doall))

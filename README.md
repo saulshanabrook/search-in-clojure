@@ -13,6 +13,8 @@ This README is not complete yet and the bottom is out of date.
 
 ```bash
 lein run search.recorders.text/timbre search.examples.list/hill-climb-config
+
+lein trampoline run search.recorders.text/min-distance search.examples.push-saul/genetic-config
 ```
 
 
