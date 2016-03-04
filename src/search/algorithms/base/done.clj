@@ -15,10 +15,13 @@
   [{index :index} :- search/Generation]
   (>= (inc index) max_))
 
-(defnk-fn max-trait :- s/Bool
-  "Returns true after any individual in the current generation has trait `name`
-   greater than `max`."
-  [name :- s/Keyword
-   max_ :- s/Int]
+(defnk-fn any-trait :- s/Bool
+  "Returns true if `traits->done?` returns true for any of the individuals' traits."
+  [traits->done? :- (s/=> s/Bool search/Traits)]
   [generation :- search/Generation]
-  (<= max_ (apply max (sp/select [:individuals sp/ALL :traits name] generation))))
+  (do
+    (->> generation
+      :individuals
+      (map :traits)
+      (some traits->done?)
+      boolean)))

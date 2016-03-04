@@ -1,17 +1,33 @@
-(ns search.algorithms.seq.tweak
+(ns search.algorithms.seq
   (:require [schema.core :as s]
             [clojure.data.generators]
+            [plumbing.graph :as g]
+            [plumbing.core :refer [fnk]]
 
-            [search.algorithms.seq.core :refer [Gene Genome]]
-            [search.utils :refer [defnk-fn] :as utils]))
+            [search.utils :refer [defnk-fn] :as utils]
+            [search.algorithms.base.core :as base]
+            [search.algorithms.base.step :as step]
+            [search.algorithms.base.initial :as initial]))
 
-(defnk-fn mutate :- [Genome]
+
+(def Gene s/Any)
+(def Genome [Gene])
+
+(defnk-fn ->genome :- Genome
+  "Creates an initial genome by creating `n` genes, from `->gene`"
+  [->gene :- (s/=> Gene)
+   n :- s/Int]
+  []
+  (repeatedly n ->gene))
+
+
+(defnk-fn mutate :- Genome
   "Replaces each gene in the genome with probability `prob`, creating a new
   gene with `->gene` if needed."
   [p :- utils/Probability
    ->gene :- (s/=> Gene)]
   [genome :- Genome]
-  [(map #(if (utils/rand-true? p) (->gene) %) genome)])
+  (map #(if (utils/rand-true? p) (->gene) %) genome))
 
 (s/defn length-within :- s/Int
   "Given a number of sequences, returns a random length that is less than all
@@ -31,6 +47,28 @@
         [first-split second-split] (map (partial split-at split-length) [first_ second_])]
     [(concat (first first-split) (second second-split))
      (concat (first second-split) (second first-split))]))
+
+(def tweak-weights {:mutate 1
+                    :one-point-crossover 99})
+
+(def tweaks-graph
+ (g/graph
+   :mutate-p (fnk [] 0.01)
+   :tweaks
+    {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
+              :n-parents (fnk [] 1)
+              :multiple-children? (fnk [] false)}
+     :one-point-crossover {:f (fnk [] one-point-crossover)
+                           :n-parents (fnk [] 2)
+                           :multiple-children? (fnk [] true)}}))
+
+(def graph
+ (g/graph
+   :->genome ->genome
+   tweaks-graph
+   :tweak-weights (fnk _ :- {s/Keyword s/Int} [] tweak-weights)
+   :->tweak step/weighted-tweaks
+   :initial initial/->genome->))
 
 ; (s/defn alternation
 ;   "Merges two sequences, taking sequential items from one then crossing over and

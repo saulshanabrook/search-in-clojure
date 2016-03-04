@@ -12,9 +12,8 @@
 (deftest genetic-test
   (testing "Can compile graph"
     (is-algorithm genetic/graph
-      {:population-size s/Int
-       :done? (s/=> s/Bool)
-       :tweak (s/=> [search/Individual] [search/Individual])
+      {:done? (s/=> s/Bool)
+       :->tweak (s/=> [search/Individual] [search/Individual])
        :select (s/=> search/Individual [search/Individual])
        :->genome (s/=> search/Genome)
        :genome->traits (s/=> search/Traits search/Genome)})))

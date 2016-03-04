@@ -93,10 +93,8 @@
       (s/fn ~(symbol-append name "-inner") :- ~return-schema
         ~inner-args
         ~body))))
-;
-; (defn fnk-rename-args
-;   "Takes a fnk and a mapping of old argument names to new argument names.
-;   For example, `(fnk-rename-args (fnk [a] a) {:a :b})` would return a fnk that
-;   takes an input named `b`"
-;   [fnk_ mapping])
-;
+
+(defmacro InfSeq
+  "Validate an infinite lazy sequence by checking the first value"
+  [inner]
+  `(s/pred #(s/validate ~inner (first %))))

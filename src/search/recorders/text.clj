@@ -8,3 +8,10 @@
    :record-run! (s/fn [run :- search/Run] (timbre/info "Run: " run))
    :record-generation! (s/fn [generation :- search/Generation] (timbre/info "Generation: " generation))
    :record-run-done! (s/fn [run :- search/Run] (timbre/info "Run finished: " run))})
+
+(s/def max-value :- search/Recorder
+  "Prints the max `:value` trait each generation on a newline."
+  {:record-config! (fn [_] nil)
+   :record-run! (fn [_] nil)
+   :record-generation! #(->> % :individuals (map (comp :value :traits)) (apply max) println)
+   :record-run-done! (fn [_] nil)})

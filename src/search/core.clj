@@ -1,7 +1,6 @@
 (ns search.core
   (:require [schema.core :as s]
             [plumbing.graph :as g]
-
             [search.utils :as utils]))
 
 
@@ -13,7 +12,7 @@
 
 (def Genome s/Any)
 
-(def TraitKey s/Keyword)
+(def TraitKey s/Any)
 (def TraitValue s/Int)
 
 (def Traits
@@ -25,7 +24,7 @@
   {:genome Genome
    :id s/Str
    :traits Traits
-   :parents-ids [s/Str]})
+   :parents-ids #{s/Str}})
 
 (def Generation
   "Holds the whole state for a current generation of individuals."
@@ -64,6 +63,7 @@
    from the config."
   [run :- Run]
   (let [graph (config->graph (:config run))]
+    (assert (= #{:run-id} (-> graph plumbing.fnk.pfnk/input-schema plumbing.fnk.schema/explicit-schema-key-map keys set)))
     (:generations (g/run graph {:run-id (:id run)}))))
 
 (s/defn execute

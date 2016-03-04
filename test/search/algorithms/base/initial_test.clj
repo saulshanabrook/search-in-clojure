@@ -18,8 +18,8 @@
             :run-id run-id
             :individuals (repeat n {:genome :test
                                     :id id_
-                                    :parents-ids []
+                                    :parents-ids #{}
                                     :traits {}})}
            (initial/->genome-> {:->genome (fn [] :test)
-                              :n          n
-                              :run-id     run-id}))))))
+                                :n          n
+                                :run-id     run-id}))))))

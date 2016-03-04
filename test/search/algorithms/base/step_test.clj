@@ -30,28 +30,36 @@
   (let [->individual #(->
                        search/Individual
                        g/generate
-                       (assoc :id %))]
-    (testing "tweak"
-      (let [tweak (fn [_]
-                    (cycle
-                      [[(->individual "first") (->individual "second")]
-                       [(->individual "third") (->individual "fourth")]]))
-            bread (step/select-and-tweak {:select first :tweak tweak})
-            generation (g/generate search/Generation)
-            next-individuals (bread generation)
-            next-ids (map :id next-individuals)]
-        (is (= ["first" "second" "third" "fourth"] (take 4 next-ids))))
-      (testing "select"
-        (let [generation (->
-                          search/Generation
-                          g/generate
-                          (assoc :individuals [(->individual "first") (->individual "second")]))
+                       (assoc :genome %))
+        inds [(->individual 1) (->individual 2)]
+        inds-ids (map :id inds)
+        generation (->
+                    search/Generation
+                    g/generate
+                    (assoc :individuals inds))
 
-              select (fn [individuals]
-                      (cycle [(first individuals) (first individuals) (second individuals)]))
-              bread (step/select-and-tweak {:select select :tweak (fn [a] a)})
-              _ (s/set-fn-validation! false)
-              next-individuals (bread generation)
-              _ (s/set-fn-validation! true)
-              next-ids (map :id next-individuals)]
-          (is (= '("first" "first" "second" "first") (take 4 next-ids))))))))
+        tweak-add-and-mult {:f (fn [a b] [(+ a b) (* a b)])
+                             :multiple-children? true
+                             :n-parents 2}
+        tweak-inc {:f inc
+                   :multiple-children? false
+                   :n-parents 1}
+        tweaks (atom [tweak-add-and-mult tweak-inc])
+        ; Should first use the `tweak-inc` and then `tweak-add-and-mult` and repeat
+        s-and-t (step/select-and-tweak
+                 {:select cycle
+                  :->tweak (fn [] (first (swap! tweaks reverse)))})
+        children (s-and-t generation)]
+    (is (= [{:genome 2 :parents-ids #{(first inds-ids)}}; first should inc the first ind
+            {:genome 3 :parents-ids (set inds-ids)} {:genome 2 :parents-ids (set inds-ids)} ; then add and multiply the last and the first
+            {:genome 3 :parents-ids #{(second inds-ids)}}] ; then should increment the last
+           (take 4 (map #(select-keys % [:genome :parents-ids]) children))))))
+
+(deftest weighted-tweaks-test
+  (let [first_tweak {:f identity :n-parents 23143 :multiple-children? true}
+        second_tweak {:f identity :n-parents 234 :multiple-children? false}
+        ->tweak #(step/weighted-tweaks
+                  {:tweaks {:first first_tweak :second second_tweak}
+                   :tweak-weights %})]
+    (is (= first_tweak ((->tweak {:first 1 :second 0}))))
+    (is (= second_tweak ((->tweak {:first 0 :second 1}))))))

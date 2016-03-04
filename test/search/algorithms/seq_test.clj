@@ -1,16 +1,24 @@
-(ns search.algorithms.seq.tweak-test
+(ns search.algorithms.seq-test
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
 
-            [search.algorithms.seq.tweak :as tweak]))
+            [search.algorithms.seq :as seq]))
 (use-fixtures :once schema.test/validate-schemas)
 
+
+(deftest ->genome-test
+  (let [val (atom 0)
+        ->genome (seq/->genome {:n 3
+                                :->gene #(swap! val inc)})]
+    (is (= [1 2 3] (->genome)))))
+
+
 (deftest mutate-test
-  (let [mutate #(tweak/mutate {:p %
-                               :->gene (fn [] :new)})]
-    (is (= [[:old :old]] ((mutate 0) [:old :old])))
-    (is (= [[:new :new]] ((mutate 1) [:old :old])))))
+  (let [mutate #(seq/mutate {:p %
+                             :->gene (fn [] :new)})]
+    (is (= [:old :old] ((mutate 0) [:old :old])))
+    (is (= [:new :new] ((mutate 1) [:old :old])))))
 
 (s/defn same-seqs? :- s/Bool
   "Tests if `x` has the same (unordered) sequences inside any of the sequences in `ys`.
@@ -21,7 +29,7 @@
   (= true (some #(= (set (map seq %)) (set (map seq x))) ys)))
 
 (deftest one-point-crossover-test
-  (are [x1 x2 outs] (let [actual-out (tweak/one-point-crossover x1 x2)]
+  (are [x1 x2 outs] (let [actual-out (seq/one-point-crossover x1 x2)]
                       (some #(= % (set actual-out)) outs))
     [1] [2] #{#{[1] [2]}}
     [1 1] [2 2] #{#{[1 2] [2 1]}}

@@ -4,41 +4,39 @@
             [plumbing.core :refer [fnk]]
 
             [search.core :as search]
+            [search.algorithms.base.select :as select]
+            [search.algorithms.seq :as seq]
             [search.algorithms.base.done :as done]))
 
 (def Gene s/Int)
 (def Genome [Gene])
 
-(s/defn score :- s/Int
+(s/defn score :- {:value s/Int}
   "count of the number of ones in the list"
   [ind :- Genome]
-  (->>
-    ind
-    (filter (partial = 1))
-    count))
+  {:value (->>
+           ind
+           (filter (partial = 1))
+           count)})
 
 (s/defn binary :- Gene
   "random int, either 1 or 0"
   []
   (rand-int 2))
 
-(s/defn individual :- Genome
-  "a new random list of 1s and 0s"
-  []
-  (vec (repeatedly 10 binary)))
-
-(s/defn mutate :- Genome
-  "changes a random index of the list to a 0|1"
-  [ind :- Genome]
-  (assoc ind (rand-int 10) (binary)))
-
 (def problem-graph
   (g/graph
-    :->genome (fnk [] individual)
-    :mutate (fnk [] mutate)
-    :genome->value (fnk [] score)
-    :done? (g/instance done/max-trait {:name :value :max_ 10})))
+    :->gene (fnk [] binary)
+    (g/instance seq/graph {:n 100})
+    :mutate (g/instance seq/mutate {:p 0.1})
+    :genome->traits (fnk [] score)
+    :select (g/instance select/dominates {:trait-name :value :lowest? false})
+    :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 100))})))
 
 (def hill-climb-config
-  (search/->config ['search.algorithms.hill-climb/graph
-                    'search.examples.list/problem-graph]))
+  (search/->config ['search.examples.list/problem-graph
+                    'search.algorithms.hill-climb/graph]))
+
+(def genetic-config
+  (search/->config ['search.examples.list/problem-graph
+                    'search.algorithms.genetic/graph]))

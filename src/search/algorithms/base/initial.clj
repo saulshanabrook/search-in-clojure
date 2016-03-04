@@ -14,6 +14,6 @@
   {:index 0
    :run-id run-id
    :individuals (repeatedly n (fn [] {:genome (->genome)
-                                      :parents-ids []
+                                      :parents-ids #{}
                                       :id (utils/id)
                                       :traits {}}))})

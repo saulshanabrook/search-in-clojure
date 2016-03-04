@@ -16,12 +16,11 @@
     (is (not ((->max-generations-inner 2) (gen-with-index 0))))
     (is ((->max-generations-inner 2) (gen-with-index 1)))))
 
-(deftest max-trait-test
+(deftest any-trait-test
   (let [trait :value
         ind-with-trait-value #(-> search/Individual g/generate (assoc :traits {trait %}))
         generation #(-> search/Generation g/generate (assoc :individuals (map ind-with-trait-value %)))
-        done? #(done/max-trait {:name trait :max_ %})]
-    (is ((done? 0) (generation [0])))
-    (is (not ((done? 10) (generation [0]))))
-    (is ((done? 10) (generation [0 10])))
-    (is ((done? 10) (generation [0 20])))))
+        done? (done/any-trait {:traits->done? #(-> % trait (= 10))})]
+    (is (done? (generation [10])))
+    (is (not (done? (generation [0]))))
+    (is (done? (generation [0 10])))))

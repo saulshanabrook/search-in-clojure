@@ -14,5 +14,6 @@
     (is-algorithm hill-climb/graph
       {:->genome (s/=> search/Genome)
        :mutate (s/=> search/Genome search/Genome)
-       :genome->value (s/=> search/TraitValue search/Genome)
-       :done? (s/=> s/Bool)})))
+       :genome->traits (s/=> search/Traits search/Genome)
+       :select (s/=> search/Individual [search/Individual])
+       :done? (s/=> s/Bool search/Generation)})))
