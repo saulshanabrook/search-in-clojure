@@ -1,14 +1,10 @@
 (ns search.core
   (:require [schema.core :as s]
             [plumbing.graph :as g]
+            [plumbing.core :refer [fnk defnk]]
+            [plumbing.fnk.schema]
+
             [search.utils :as utils]))
-
-
-(def Config {:graphs [s/Symbol]
-             :id s/Str})
-
-(def Run {:config Config
-          :id s/Str})
 
 (def Genome s/Any)
 
@@ -28,54 +24,88 @@
 
 (def Generation
   "Holds the whole state for a current generation of individuals."
-  {:run-id s/Str
+  {:search-id s/Str
    :index s/Int
-   :individuals [Individual]})
+   :individuals #{Individual}})
 
-; A Recorder is responsible for displaying or saving the resaults of an
-; execution.
-(def Recorder
-  "responsible for displaying or saving the resaults of an execution."
-  {:record-config! (s/=> Config [])
-   :record-run! (s/=> Run [])
-   :record-generation! (s/=> Generation [])
-   :record-run-done! (s/=> Run [])})
+(def Wrapper [(s/one s/Symbol "fn") s/Any])
 
-(s/defn ->config :- Config
-  "Creates a new configuration. Each item in `graphs` should be a symbol
-   pointing to a partial graph."
-  [graphs :- [s/Symbol]]
-  {:id (utils/id) :graphs graphs})
+(def Search
+  "A search configuration is represented as a map. It contains all the data
+   neccesary to run the search in a serializiable form, so that it can be
+   preserved in a text form.
 
+   The most important are the `graph-symbols`. These are a list of symbols
+   that should point to partial graphs which are all merged.
 
-(s/defn config->run :- Run
-  "Create a new run from an existing config"
-  [config :- Config]
-  {:config config
-   :id (utils/id)})
+   Then `values` are used to override keys with values.
 
-(s/defn config->graph
-  [{:keys [graphs]} :- Config]
-  (apply merge (map utils/symbol->value graphs)))
+   The `wrapper-symbols` represent a sequence of functions that take in a graphs
+   and return an udpated graph. They are represented as `[fn-symbol & optional-args]`
+   and called like `((apply partial fn optional-args) graph)`. If any of the
+   args is a symbol, they are resolved into the value at that symbol. The leftmost
+   one is called first, like the thread macro.
+   "
+  {:graph-symbols [s/Symbol]
+   :values {s/Keyword s/Any}
+   :wrapper-symbols [Wrapper]})
 
-(s/defn run->generations :- [Generation]
-  "Return all the generations, by accessing the `:generations` key on the map
-   from the config."
-  [run :- Run]
-  (let [graph (config->graph (:config run))]
-    (assert (= #{:run-id} (-> graph plumbing.fnk.pfnk/input-schema plumbing.fnk.schema/explicit-schema-key-map keys set)))
-    (:generations (g/run graph {:run-id (:id run)}))))
+(def SearchID s/Str)
+(def SearchGraph (s/constrained utils/Graph #(contains? % :generations)))
 
-(s/defn execute
-  "Execute one run, based on the configuration, recording all progress with the
-  recorder"
-  [recorder :- Recorder
-   config :- Config]
+(defnk ->search :- Search
+  [{graph-symbols []}
+   {values {}}
+   {wrapper-symbols []}]
+  {:graph-symbols graph-symbols
+   :values values
+   :wrapper-symbols wrapper-symbols})
 
-  ((:record-config! recorder) config)
+(defn val->fnk
+  "Returns a fnk that just returns the passed in value
 
-  (let [run (config->run config)]
-    ((:record-run! recorder) run)
-    (let [generations (run->generations run)]
-      (doseq [generation generations] ((:record-generation! recorder) generation))
-      ((:record-run-done! recorder) run))))
+  We have to make sure the output has the right schema to deal with
+  https://github.com/plumatic/plumbing/issues/117"
+  [v]
+  (s/schematize-fn
+    (fn [_] v)
+    (s/=>
+      (eval (plumbing.fnk.schema/guess-expr-output-schema v))
+      {s/Keyword s/Any})))
+
+(def compute-search-graph
+  (g/graph
+   :default-graph (fnk [] (hash-map :search-id (fnk [] (utils/id))))
+   :graphs (fnk [graph-symbols :- [s/Symbol]] (map utils/symbol->value graph-symbols))
+   :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
+   :values-graph (fnk [values :- {s/Keyword s/Any}]
+                  (->> values
+                    (plumbing.core/map-vals val->fnk)
+                    g/graph))
+   :wrappers (fnk [wrapper-symbols :- [Wrapper]]
+              (let [opt-symbol->value #(if (symbol? %1) (utils/symbol->value %1) %1)]
+                (map (partial map opt-symbol->value) wrapper-symbols)))
+   :wrapper-fns (fnk [wrappers :- [s/Any]] (map #(apply partial (first %1) (rest %1)) wrappers))
+   :wrapper-fn (fnk [wrapper-fns :- [s/Any]] (apply comp (reverse wrapper-fns)))
+   :final-graph (fnk [default-graph :- utils/Graph
+                      graph :- utils/Graph
+                      values-graph :- utils/Graph
+                      wrapper-fn]
+                 (-> default-graph
+                  (g/graph graph)
+                  (merge values-graph)
+                  wrapper-fn))
+   :computed (fnk [final-graph :- SearchGraph search :- Search]
+              (g/run final-graph {:search search}))))
+
+(def compute-search (g/compile compute-search-graph))
+
+(s/defn search->generations ; infinite sequence of generations
+  "Computes the generations for the search. Returns a (possibly infinite)
+  lazy sequence of generations. The computation happens when you resolve them."
+  [search :- Search]
+  (-> search
+    (assoc :search search)
+    compute-search
+    :computed
+    :generations))

@@ -23,7 +23,7 @@
       }
   "
   (g/graph
-    :population-size (fnk [] 2)
+    :population-size (fnk [] 1000)
     :initial (g/instance initial/->genome-> [population-size] {:n population-size})
     :evaluate evaluate/genome->traits->
     :breed step/select-and-tweak

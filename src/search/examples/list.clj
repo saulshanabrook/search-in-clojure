@@ -3,7 +3,6 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.core :as search]
             [search.algorithms.base.select :as select]
             [search.algorithms.seq :as seq]
             [search.algorithms.base.done :as done]))
@@ -24,19 +23,11 @@
   []
   (rand-int 2))
 
-(def problem-graph
+(def graph
   (g/graph
     :->gene (fnk [] binary)
-    (g/instance seq/graph {:n 100})
+    (g/instance seq/graph {:n-genes 100})
     :mutate (g/instance seq/mutate {:p 0.1})
     :genome->traits (fnk [] score)
     :select (g/instance select/dominates {:trait-name :value :lowest? false})
     :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 100))})))
-
-(def hill-climb-config
-  (search/->config ['search.examples.list/problem-graph
-                    'search.algorithms.hill-climb/graph]))
-
-(def genetic-config
-  (search/->config ['search.examples.list/problem-graph
-                    'search.algorithms.genetic/graph]))

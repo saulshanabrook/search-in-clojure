@@ -48,12 +48,12 @@
     [(concat (first first-split) (second second-split))
      (concat (first second-split) (second first-split))]))
 
-(def tweak-weights {:mutate 1
-                    :one-point-crossover 99})
+(def tweak-weights {:mutate 50
+                    :one-point-crossover 50})
 
 (def tweaks-graph
  (g/graph
-   :mutate-p (fnk [] 0.01)
+   :mutate-p (fnk [] 0.02)
    :tweaks
     {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
               :n-parents (fnk [] 1)
@@ -64,11 +64,10 @@
 
 (def graph
  (g/graph
-   :->genome ->genome
+   :->genome (g/instance ->genome [n-genes] {:n n-genes})
    tweaks-graph
    :tweak-weights (fnk _ :- {s/Keyword s/Int} [] tweak-weights)
-   :->tweak step/weighted-tweaks
-   :initial initial/->genome->))
+   :->tweak step/weighted-tweaks))
 
 ; (s/defn alternation
 ;   "Merges two sequences, taking sequential items from one then crossing over and

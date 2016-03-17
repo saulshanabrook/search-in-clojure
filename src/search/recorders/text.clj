@@ -1,24 +1,23 @@
 (ns search.recorders.text
   (:require [schema.core :as s]
             [taoensso.timbre :as timbre]
-            [search.core :as search]))
 
-(s/def timbre :- search/Recorder
-  {:record-config! (s/fn [config :- search/Config] (timbre/info "Config: " config))
-   :record-run! (s/fn [run :- search/Run] (timbre/info "Run: " run))
-   :record-generation! (s/fn [generation :- search/Generation] (timbre/info "Generation: " generation))
-   :record-run-done! (s/fn [run :- search/Run] (timbre/info "Run finished: " run))})
+            [search.core :as search]
+            [search.recorders.core :refer [Recorder]]))
 
-(s/def max-value :- search/Recorder
+(s/def timbre :- Recorder
+  {:started! (s/fn [search :- search/Search id :- search/SearchID] (timbre/info "Created " search "with ID" id))
+   :generation! (s/fn [generation :- search/Generation] (timbre/info "Generation: " generation))
+   :done! (s/fn [id :- search/SearchID] (timbre/info "Finished " id))})
+
+(s/def max-value :- Recorder
   "Prints the max `:value` trait each generation on a newline."
-  {:record-config! (fn [_] nil)
-   :record-run! (fn [_] nil)
-   :record-generation! #(->> % :individuals (map (comp :value :traits)) (apply max) println)
-   :record-run-done! (fn [_] nil)})
+  {:started! (fn [_ _] nil)
+   :generation! #(->> % :individuals (map (comp :value :traits)) (apply max) println)
+   :done! (fn [_] nil)})
 
-(s/def min-distance :- search/Recorder
+(s/def min-distance :- Recorder
  "Prints the min `:distance` trait each generation on a newline."
- {:record-config! (fn [_] nil)
-  :record-run! (fn [_] nil)
-  :record-generation! #(->> % :individuals (map (comp :distance :traits)) (apply min) println)
-  :record-run-done! (fn [_] nil)})
+ {:started! (fn [_ _] nil)
+  :generation! #(->> % :individuals (apply min-key (comp :distance :traits)) println)
+  :done! (fn [_] nil)})

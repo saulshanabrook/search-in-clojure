@@ -1,7 +1,6 @@
 (ns search.algorithms.base.initial-test
   (:require [clojure.test :refer :all]
             [schema.test]
-            [conjure.core :as conjure]
 
             [search.algorithms.base.initial :as initial]
             [search.utils :as utils]))
@@ -9,17 +8,19 @@
 
 
 (deftest ->genome-test
-  (let [n 10
-        run-id "_"
-        id_ "_"]
-    (conjure/stubbing [utils/id id_]
+  (let [n 3
+        search-id "_"]
+    (with-redefs [utils/id (utils/seq->fn (cycle ["0" "1" "2"]))]
       (is (=
            {:index 0
-            :run-id run-id
-            :individuals (repeat n {:genome :test
-                                    :id id_
-                                    :parents-ids #{}
-                                    :traits {}})}
+            :search-id search-id
+            :individuals (utils/repeatedly-set
+                          n
+                          (fn []
+                            {:genome :test
+                             :id (utils/id)
+                             :parents-ids #{}
+                             :traits {}}))}
            (initial/->genome-> {:->genome (fn [] :test)
-                                :n          n
-                                :run-id     run-id}))))))
+                                :n n
+                                :search-id search-id}))))))

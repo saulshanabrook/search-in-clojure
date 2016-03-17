@@ -10,10 +10,14 @@
 
 (defnk-fn ->instruction :- s/Any
   "Returns a random push instruction from those defined in the `push-interpreter`
-   plus the `input-binding-names`"
-  [interpreter input-binding-names :- [s/Keyword]]
+   plus the `extra-instructions`"
+  [interpreter
+   extra-instructions :- #{s/Any}]
   []
-  (rand-nth (concat (push/known-instructions interpreter) input-binding-names)))
+  (rand-nth (concat
+             (push/known-instructions interpreter)
+             (push/binding-names interpreter)
+             extra-instructions)))
 
 (defnk-fn evaluate :- s/Any
   "Get the value off the `output-stack` by running the `program` with the bindings
@@ -28,8 +32,9 @@
 
 (def graph
   (g/graph
-    :step-limit (fnk [] 10000)
+    :extra-instructions (fnk [] #{})
+    :step-limit (fnk [] 500)
     :interpreter (fnk [] (make-everything-interpreter))
     :push-evaluate evaluate
     :->gene ->instruction
-    seq/graph))
+    (g/instance seq/graph {:n-genes 50})))

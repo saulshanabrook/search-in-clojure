@@ -2,10 +2,13 @@
   (:require [schema.core :as s]
             [clj-uuid :as uuid]
             [clojure.edn :as edn]
+            [plumbing.map]
+            [plumbing.graph]
             [clojure.data.generators]
+            [clojure.test]
             [slingshot.slingshot :refer [throw+]]))
 
-(defn id [] (uuid/to-string (uuid/v1)))
+(defn id [] (uuid/to-string (uuid/v4)))
 
 
 (defn take-until
@@ -44,8 +47,6 @@
      (name (ns-name (:ns m#)))
      (name (:name m#)))))
 
-
-
 (def Probability (s/constrained s/Num #(<= 0 % 1)))
 
 (s/defn rand-true? :- s/Bool
@@ -53,12 +54,10 @@
  [p :- Probability]
  (<= (clojure.data.generators/float) p))
 
-(s/defn exports-correctly? :- s/Bool
- [form :- s/Any]
- (= form (-> form pr-str edn/read-string)))
-
 (s/defn symbol-append :- s/Symbol
-  [sym :- s/Symbol after :- s/Str]
+  "Append the string `after` to the symbol `sym`."
+  [sym :- s/Symbol
+   after :- s/Str]
   (symbol (str sym after)))
 
 (defmacro defnk-fn
@@ -87,14 +86,107 @@
   [name _ return-schema doc-string outer-args inner-args body]
   (let [inner-fnc-dummy (eval `(s/fn _ :- ~return-schema ~inner-args nil))
         inner-fnc-schema (s/fn-schema inner-fnc-dummy)]
-    `(plumbing.core/defnk ~name :- ~inner-fnc-schema
-      ~doc-string
-      ~outer-args
-      (s/fn ~(symbol-append name "-inner") :- ~return-schema
-        ~inner-args
-        ~body))))
+    (list 'plumbing.core/defnk name ':- inner-fnc-schema
+      doc-string
+      outer-args
+      (list 'schema.core/fn (symbol-append name "-inner") ':- return-schema
+        inner-args
+        body))))
 
 (defmacro InfSeq
-  "Validate an infinite lazy sequence by checking the first value"
+  "Validate an infinite lazy sequence by making sure the first value is `inner`"
   [inner]
   `(s/pred #(s/validate ~inner (first %))))
+
+(s/defn repeatedly-set :- #{s/Any}
+  "Call `f` repeatedly until we have `n` unique value and return them as a set."
+  [n :- s/Int
+   f :- (s/=> s/Any)]
+  (loop [s #{}]
+    (if (= (count s) n)
+      s
+      (recur (conj s (f))))))
+
+(s/defn take-set :- #{s/Any}
+  "Takes the first `n` unique values from the collection and return as a set."
+  [n :- s/Int
+   c] ; collection
+ (loop [s #{}
+        c c]
+   (if (= (count s) n)
+     s
+     (recur (conj s (first c)) (rest c)))))
+
+(s/defn seq->fn :- (s/=> s/Any)
+  "Takes a sequence and returns a function that takes no argument and returns
+  the first value first, then the second value, and so on.
+
+      (= [1 2 1] (repeatedely 3 (seq->fn (cycle [1 2]))))
+  "
+  [s]
+  (let [a (atom (conj (seq s) nil))]
+    (fn []
+      (first (swap! a rest)))))
+
+(defn do-before
+  "Wraps the lazy sequence to execute the function when the first value is resolved."
+  [f xs]
+  (concat (lazy-seq (do (f) nil)) xs))
+
+(defn do-during
+  "Wraps the lazy sequence to execute the function with each value, as it is resolved."
+  [f xs]
+  (map (fn [x] (f x) x) xs))
+
+
+(defn do-after
+  "Wraps the lazy sequence to execute the function after the last value is resolved."
+  [f xs]
+  (concat xs (lazy-seq (do (f) nil))))
+
+; below from https://github.com/plumatic/plumbing/issues/119#issuecomment-197501172
+(defn fnk? [x] (try (plumbing.fnk.pfnk/io-schemata x) true (catch Exception e false)))
+
+(s/defschema Fnk (s/pred fnk?))
+
+(s/defschema GraphLike (s/cond-pre {s/Keyword (s/recursive #'GraphLike)} Fnk))
+
+(s/defschema Graph (s/constrained GraphLike plumbing.graph/->graph))
+
+(defn wrap
+  "Returns a wrapped version of `orig-f`, where `wrapped-f` should be a wrapped
+   version of it, by copying the metadata."
+  [orig-f wrapped-f]
+  (with-meta wrapped-f (meta orig-f)))
+
+(defn wrap-output
+  "Takes a function and wraps its output by calling `orig->new-output` on each
+   returned values"
+  [orig-f orig->new-output]
+  (wrap orig-f (comp orig->new-output orig-f)))
+
+(defn wrap-before
+  "Wraps a function by calling function `before!` on the input arguments."
+  [orig-f before!]
+  (wrap orig-f (fn [& args] (apply before! args) (apply orig-f args))))
+
+
+(defn wrap-after
+  "Wraps a funciton by calling stateful function `after!` when it returns, on the
+   return value."
+  [orig-f after!]
+  (wrap orig-f (fn [& args] (let [res (apply orig-f args)] (after! res) res))))
+
+(s/defn map-leaf-fns :- Graph
+  "Wraps all functions returned from the leaves in the graph `g` with `fn-wrapper`.
+
+  `fn-wrapper` should take the old function and the key path and return a new one"
+  [fn-wrapper g :- Graph]
+  (plumbing.map/map-leaves-and-path
+    (fn [ks f]
+      (wrap-output f
+        (fn [res]
+          (if (clojure.test/function? res)
+            (fn-wrapper {:f res :ks ks})
+            res))))
+    g))

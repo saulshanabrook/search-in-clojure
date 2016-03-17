@@ -20,7 +20,7 @@
   This is a single objective selection."
   [trait-name :- s/Keyword
    lowest? :- s/Bool]
-  [inds :- [search/Individual]]
+  [inds :- #{search/Individual}]
   (let [weights (->> inds
                   (map #(get-in % [:traits trait-name]))
                   ((if lowest? invert-list identity))
@@ -34,7 +34,7 @@
    Single opjective selection."
   [trait-name :- s/Keyword
    lowest? :- s/Bool]
-  [inds :- [search/Individual]]
+  [inds :- #{search/Individual}]
   (repeat (apply
            (partial (if lowest? min-key max-key) (comp trait-name :traits))
            inds)))

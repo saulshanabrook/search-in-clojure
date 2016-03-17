@@ -19,7 +19,7 @@
 (deftest any-trait-test
   (let [trait :value
         ind-with-trait-value #(-> search/Individual g/generate (assoc :traits {trait %}))
-        generation #(-> search/Generation g/generate (assoc :individuals (map ind-with-trait-value %)))
+        generation #(-> search/Generation g/generate (assoc :individuals (into #{} (map ind-with-trait-value %))))
         done? (done/any-trait {:traits->done? #(-> % trait (= 10))})]
     (is (done? (generation [10])))
     (is (not (done? (generation [0]))))

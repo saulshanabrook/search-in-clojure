@@ -12,8 +12,8 @@
    breed :- (s/=> [search/Individual] search/Generation)]
   [generation :- search/Generation]
   {:index       (inc (:index generation))
-   :run-id      (:run-id generation)
-   :individuals (take n (breed generation))})
+   :search-id      (:search-id generation)
+   :individuals (utils/take-set n (breed generation))})
 
 (def Tweak {:f (s/=> (s/cond-pre [search/Genome] search/Genome) & [search/Genome])
             :n-parents s/Int
@@ -36,7 +36,7 @@
   Then it repeatedly calls the `->tweak` function to get a `Tweak` function. It calls
   each `f` with the required number of parents, and lazily returns the
   children generated. Then it recurses with the rest of the parents."
-  [select :- (s/=> (utils/InfSeq search/Individual) [search/Individual])
+  [select :- (s/=> (utils/InfSeq search/Individual) #{search/Individual})
    ->tweak :- (s/=> Tweak)]
   [{individuals :individuals} :- search/Generation]
   (let [f (fn select-and-tweak-inner [parents]

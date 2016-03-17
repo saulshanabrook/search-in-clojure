@@ -14,15 +14,18 @@
                  [org.clojars.runa/conjure "2.1.3"]
                  [com.rpl/specter "0.9.2"]
                  [slingshot "0.12.2"]
-                 [klapaucius "0.1.8-SNAPSHOT"]
-                 [clj-fuzzy "0.3.1"]]
+                 [klapaucius "0.1.10-SNAPSHOT"]
+                 [clj-fuzzy "0.3.1"]
+                 [org.clojure/tools.cli "0.3.3"]]
   :profiles {:dev {:dependencies [[slamhound "1.5.5"]]
                    :plugins [[lein-kibit "0.1.2"]
                              [jonase/eastwood "0.2.3"]
                              [lein-ancient "0.6.8"]
                              [lein-cloverage "1.0.6"]
                              [lein-codox "0.9.4"]
-                             [lein-exec "0.3.6"]]}}
+                             [lein-exec "0.3.6"]
+                             [lein-gorilla "0.3.6"]]}}
+
 
   :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
             "slamhound" ["run" "-m" "slam.hound"]}

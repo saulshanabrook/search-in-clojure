@@ -1,56 +1,72 @@
 (ns search.core-test
   (:require [clojure.test :refer :all]
-            [conjure.core :as conjure]
-            [search.conjure-utils :refer [verify-first-call-args-for-p]]
-            [schema.test :as st]
-            [plumbing.core :refer [fnk]]
+            [schema.test]
             [schema.experimental.generators :as g]
+            [plumbing.core :refer [fnk]]
 
-            [search.core :as search]))
+            [search.core :as search]
+            [search.utils :as utils]))
 
+(use-fixtures :once schema.test/validate-schemas)
 
-(defn record-config! [_])
-(defn record-run! [_])
-(defn record-generation! [_])
-(defn record-run-done! [_])
+(defn gens-with-search-id
+  [search-id]
+  (repeatedly #(->
+                search/Generation
+                g/generate
+                (assoc :search-id search-id))))
 
-(def sample-generation (g/generate search/Generation))
-(def sample-graph {:generations (fnk [run-id] [(assoc sample-generation :run-id run-id)])})
+(def search-id-graph
+  {:generations (fnk [search-id] (gens-with-search-id search-id))})
 
-(st/deftest execute-test
-  (conjure/instrumenting [record-config! record-run! record-generation! record-run-done!]
-    (let [recorder_ {:record-config! record-config!
-                     :record-run! record-run!
-                     :record-generation! record-generation!
-                     :record-run-done! record-run-done!}
-          config_ (search/->config ['search.core-test/sample-graph])]
-      (search/execute recorder_ config_)
-      (testing "record-config!"
-        (conjure/verify-called-once-with-args record-config! config_))
-      (testing "record-run!"
-        (conjure/verify-call-times-for record-run! 1)
-        (verify-first-call-args-for-p record-run! #(= config_ (:config %)))
-        (verify-first-call-args-for-p record-run! #(not (clojure.string/blank? (:id %)))))
-      (testing "record-generation!"
-        (conjure/verify-call-times-for record-generation! 1)
-        (verify-first-call-args-for-p record-generation! #(not (clojure.string/blank? (:run-id %))))
-        (verify-first-call-args-for-p record-generation! #(=
-                                                           (dissoc sample-generation :run-id)
-                                                           (dissoc % :run-id))))
-      (testing "record-run-done!"
-        (conjure/verify-call-times-for record-run-done! 1)
-        (verify-first-call-args-for-p record-run-done! #(= config_ (:config %)))
-        (verify-first-call-args-for-p record-run-done! #(not (clojure.string/blank? (:id %))))))))
+(def base-graph
+  {:something (fnk [] "some value")})
 
+(def depends-on-base-graph
+  {:generations (fnk [something] (gens-with-search-id something))})
 
-(st/deftest run->generations-test
-  (let [config_ (search/->config ['search.core-test/sample-graph])
-        run_ (search/config->run config_)
-        generations_ (search/run->generations run_)]
-    (is (= [(assoc sample-generation :run-id (:id run_))] generations_))))
+(def takes-map-graph
+  {:generations (fnk [some-map :- {:search-id search/SearchID}] (gens-with-search-id (:search-id some-map)))})
 
-(st/deftest config->run-test
-  (let [config_ (search/->config ['search.core-test/sample-graph])
-        run_ (search/config->run config_)]
-    (is (= (:config run_) config_))
-    (is ((comp not clojure.string/blank?) (:id run_)))))
+(defn change-search-id
+  [new-id g]
+  (assoc g :search-id (fnk [] new-id)))
+
+(defn first-search-id
+  [search]
+  (-> search search/search->generations first :search-id))
+
+(deftest search->generations-test
+  (testing "search-id"
+    (with-redefs [utils/id (fn [] "test-id")]
+      (let [search_ {:graph-symbols [`search-id-graph]
+                     :values {}
+                     :wrapper-symbols []}]
+        (is (= "test-id" (first-search-id search_))))))
+
+  (testing "multiple graphs"
+    (let [search_ {:graph-symbols [`base-graph
+                                   `depends-on-base-graph]
+                   :values {}
+                   :wrapper-symbols []}]
+      (is (= "some value" (first-search-id search_)))))
+
+  (testing "values override"
+    (let [search_ {:graph-symbols [`base-graph
+                                   `depends-on-base-graph]
+                   :values {:something "some other value"}
+                   :wrapper-symbols []}]
+      (is (= "some other value" (first-search-id search_)))))
+
+  (testing "values override map"
+    (let [search_ {:graph-symbols [`takes-map-graph]
+                   :values {:some-map {:search-id "yeah"}}
+                   :wrapper-symbols []}]
+      (is (= "yeah" (first-search-id search_)))))
+
+  (testing "multiple wrappers"
+    (let [search_ {:graph-symbols [`search-id-graph]
+                   :values {}
+                   :wrapper-symbols [[`change-search-id "first"]
+                                     [`change-search-id "second"]]}]
+      (is (= "second" (first-search-id search_))))))

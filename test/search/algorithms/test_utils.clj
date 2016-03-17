@@ -11,11 +11,11 @@
   ;
   ; The code below does this, but it fails because of some weirdnesses
   ; on funciton types not being the same, even when they are
-  ; (is (= (merge {:run-id s/Str
+  ; (is (= (merge {:search-id s/Str
   ;                s/Keyword s/Any}
   ;                 inputs)
   ;        (pfnk/input-schema g))))
-  (is (= (set (conj (keys inputs) :run-id))
+  (is (= (set (conj (keys inputs) :search-id))
          (->
           g
           plumbing.fnk.pfnk/input-schema

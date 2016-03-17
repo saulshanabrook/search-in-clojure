@@ -1,5 +1,5 @@
-(ns search.examples.push-saul
-  "Make a push program that returns the string `saul`"
+(ns search.examples.push-true
+  "Make a push program that returns the true"
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
@@ -17,15 +17,15 @@
             [search.algorithms.push :as push]))
 
 (defnk-fn genome->traits :- s/Any
-  "Computes the levenshtein distance between the genome and 'saul'"
+  "Whether the returned value is `true`"
   [push-evaluate]
   [genome]
-  {:distance (metrics/levenshtein "saul" (push-evaluate genome {}))})
+  {:value (if (push-evaluate genome {}) 1 0)})
 
 (def graph
   (g/graph
-    (assoc (g/instance push/graph {:output-stack :string})
-      :interpreter (fnk [] (register-modules (classic-interpreter) [random-scalars-module])))
+    (g/instance push/graph {:output-stack :boolean})
     :genome->traits genome->traits
-    :select (g/instance select/roulette {:trait-name :distance :lowest? true})
-    :done? (g/instance done/any-trait {:traits->done? #(-> % :distance (= 0))})))
+    :select (g/instance select/roulette {:trait-name :value
+                                         :lowest? false})
+    :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 1))})))
