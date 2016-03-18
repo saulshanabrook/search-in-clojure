@@ -1,6 +1,5 @@
 (ns search.algorithms.testcases-test
   (:require [clojure.test :refer :all]
-            [schema.core :as s]
             [schema.test]
 
             [search.algorithms.testcases :as testcases]))

@@ -9,7 +9,6 @@
 
             [search.core :as search]
             [search.utils :refer [defnk-fn]]
-            [search.algorithms.base.core :as base]
             [search.algorithms.base.evaluate :as evaluate]))
 
 (def TestInput s/Any)

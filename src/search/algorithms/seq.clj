@@ -5,9 +5,7 @@
             [plumbing.core :refer [fnk]]
 
             [search.utils :refer [defnk-fn] :as utils]
-            [search.algorithms.base.core :as base]
-            [search.algorithms.base.step :as step]
-            [search.algorithms.base.initial :as initial]))
+            [search.algorithms.base.step :as step]))
 
 
 (def Gene s/Any)

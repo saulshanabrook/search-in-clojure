@@ -1,10 +1,9 @@
 (ns search.recorders.core
-  (require [schema.core :as s]
-           [plumbing.fnk.pfnk :as pfnk]
-           [plumbing.graph :as g]
+  (:require [schema.core :as s]
+            [plumbing.fnk.pfnk :as pfnk]
 
-           [search.core :as search]
-           [search.utils :as utils]))
+            [search.core :as search]
+            [search.utils :as utils]))
 
 (def Recorder
   "responsible for displaying or saving the resaults of an execution."

@@ -1,7 +1,6 @@
 (ns search.recorders.core-test
   (:require [clojure.test :refer :all]
             [conjure.core :as conjure]
-            [search.conjure-utils :refer [verify-first-call-args-for-p]]
             [schema.test]
             [plumbing.core :refer [fnk]]
             [schema.experimental.generators :as g]

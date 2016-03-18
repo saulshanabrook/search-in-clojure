@@ -1,7 +1,6 @@
 (ns search.utils
   (:require [schema.core :as s]
             [clj-uuid :as uuid]
-            [clojure.edn :as edn]
             [plumbing.map]
             [plumbing.graph]
             [clojure.data.generators]

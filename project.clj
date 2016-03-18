@@ -32,7 +32,9 @@
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]
             ;  :config-files ["eastwood.clj"]
-             :exclude-linters [:unused-locals]}
+             :exclude-linters [:unused-locals ; warns with defnk-fn macro
+                               :keyword-typos ; warns on graph definitions in core
+                               :unused-ret-vals]} ; warns when `(apply <non-pure-function> args)`
   :codox {:source-uri "http://github.com/saulshanabrook/search-in-clojure/blob/master/{filepath}#L{line}"
           :output-path "doc"
           :metadata {:doc/format :markdown}}

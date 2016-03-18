@@ -3,12 +3,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.string]
 
-            [search.utils :refer [symbol->value]]
             [search.core :as search])
   (:gen-class))
-
-(def str->value (comp symbol->value symbol))
-
 
 (def cli-options
   [["-s" "--validate-schema" "Turn on schema validation. Will likely be slower."]
@@ -27,16 +23,6 @@
     :parse-fn read-string]
    ["-h" "--help"]])
 
-
-(defn -main
-  "Creates and executes a run. It takes two required positional arguments:
-  * `recorder-path`: Path to the recorder (i.e. `search.recorders.text/timbre`)
-  * `search-path`: Path to the search var (i.e. `search.examples.list/hill-climb-search`)
-
-  If you set the `VALIDATE_SCHEMA` env variable it will validate the schemas
-  as well."
-  [recorder-path search-path])
-
 (defn error-msg [errors]
   (str "The following errors occurred while parsing your command:\n\n"
        (clojure.string/join \newline errors)))
@@ -47,15 +33,16 @@
 
 
 (defn usage [options-summary]
-  (->> ["Creates and executes a search run."
-        ""
-        "Usage: lein run [options]"
-        ""
-        "Options:"
-        options-summary
-        ""
-        "Each option is parsed using `read-string` to create the search."]
-       (clojure.string/join \newline)))
+  (clojure.string/join
+    \newline
+    ["Creates and executes a search run."
+     ""
+     "Usage: lein run [options]"
+     ""
+     "Options:"
+     options-summary
+     ""
+     "Each option is parsed using `read-string` to create the search."]))
 
 
 (defn -main [& args]

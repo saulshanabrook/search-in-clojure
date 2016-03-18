@@ -44,8 +44,7 @@
    and return an udpated graph. They are represented as `[fn-symbol & optional-args]`
    and called like `((apply partial fn optional-args) graph)`. If any of the
    args is a symbol, they are resolved into the value at that symbol. The leftmost
-   one is called first, like the thread macro.
-   "
+   one is called first, like the thread macro."
   {:graph-symbols [s/Symbol]
    :values {s/Keyword s/Any}
    :wrapper-symbols [Wrapper]})

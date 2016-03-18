@@ -1,7 +1,5 @@
 (ns search.graph-utils
   (:require [schema.core :as s]
-            [plumbing.map]
-            [plumbing.fnk.pfnk :as pfnk]
             [plumbing.core :refer [fnk]]
 
             [search.utils :as utils]))

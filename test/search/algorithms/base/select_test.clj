@@ -4,8 +4,7 @@
             [schema.experimental.generators :as g]
 
             [search.core :as search]
-            [search.algorithms.base.select :as select]
-            [search.utils :as utils]))
+            [search.algorithms.base.select :as select]))
 
 (use-fixtures :once schema.test/validate-schemas)
 

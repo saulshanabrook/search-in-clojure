@@ -1,7 +1,6 @@
 (ns search.algorithms.base.done
   "Partial graphs that provide the `done` function. "
   (:require [schema.core :as s]
-            [com.rpl.specter :as sp]
 
             [search.core :as search]
             [search.utils :refer [defnk-fn]]))
@@ -19,9 +18,8 @@
   "Returns true if `traits->done?` returns true for any of the individuals' traits."
   [traits->done? :- (s/=> s/Bool search/Traits)]
   [generation :- search/Generation]
-  (do
-    (->> generation
-      :individuals
-      (map :traits)
-      (some traits->done?)
-      boolean)))
+  (->> generation
+    :individuals
+    (map :traits)
+    (some traits->done?)
+    boolean))

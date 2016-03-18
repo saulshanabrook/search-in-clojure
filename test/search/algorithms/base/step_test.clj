@@ -1,6 +1,5 @@
 (ns search.algorithms.base.step-test
   (:require [clojure.test :refer :all]
-            [schema.core :as s]
             [schema.test]
             [schema.experimental.generators :as g]
 
