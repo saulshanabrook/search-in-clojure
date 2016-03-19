@@ -62,18 +62,6 @@
    :values values
    :wrapper-forms wrapper-forms})
 
-(defn val->fnk
-  "Returns a fnk that just returns the passed in value
-
-  We have to make sure the output has the right schema to deal with
-  https://github.com/plumatic/plumbing/issues/117"
-  [v]
-  (s/schematize-fn
-    (fn [_] v)
-    (s/=>
-      (eval (plumbing.fnk.schema/guess-expr-output-schema v))
-      {s/Keyword s/Any})))
-
 (def compute-search-graph
   (g/graph
    :default-graph (fnk [] (hash-map :search-id (fnk [] (utils/id))))
@@ -81,7 +69,7 @@
    :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
    :values-graph (fnk [values :- {s/Keyword s/Any}]
                   (->> values
-                    (plumbing.core/map-vals val->fnk)
+                    (plumbing.core/map-vals utils/v->fnk)
                     g/graph))
    :wrappers (fnk [wrapper-forms :- [Wrapper]] (map utils/eval-load-ns wrapper-forms))
    :wrapper (fnk [wrappers :- [(s/=> utils/Graph utils/Graph)]] (apply comp (reverse wrappers)))

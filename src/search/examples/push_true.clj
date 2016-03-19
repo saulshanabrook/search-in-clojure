@@ -19,6 +19,6 @@
   (g/graph
     (g/instance push/graph {:output-stack :boolean})
     :genome->traits genome->traits
-    :select (g/instance select/roulette {:trait-name :value
-                                         :lowest? false})
+    :select (g/instance select/roulette {:trait-specs {:value {:lowest? false}}
+                                         :trait-key :value})
     :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 1))})))

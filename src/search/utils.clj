@@ -5,6 +5,7 @@
             [plumbing.graph]
             [clojure.data.generators]
             [clojure.test]
+            [plumbing.core]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn id [] (uuid/to-string (uuid/v4)))
@@ -206,3 +207,26 @@
           (when-not (and class-not-found? (not already-required?))
             (throw e))
           (recur (conj namespaces namespace)))))))
+
+(defn v->schema
+  "Returns the schema for for a value.
+
+  Like https://github.com/plumatic/plumbing/blob/23b612f361290bb3ac9326a1296dcedb6dad2b83/src/plumbing/fnk/schema.cljx#L157-L163
+  but deals with evaluted value not quoted value."
+  [v]
+  (if (map? v)
+    (plumbing.core/map-vals v->schema v)
+    s/Any))
+
+
+(defn v->fnk
+  "Returns a fnk that just returns the passed in value
+
+  We have to make sure the output has the right schema to deal with
+  https://github.com/plumatic/plumbing/issues/117"
+  [v]
+  (s/schematize-fn
+    (fn [_] v)
+    (s/=>
+      (v->schema v)
+      {s/Keyword s/Any})))

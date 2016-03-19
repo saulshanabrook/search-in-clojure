@@ -29,5 +29,6 @@
     (g/instance seq/graph {:n-genes 100})
     :mutate (g/instance seq/mutate {:p 0.1})
     :genome->traits (fnk [] score)
-    :select (g/instance select/dominates {:trait-name :value :lowest? false})
+    :select (g/instance select/dominates {:trait-specs {:value {:lowest? false}}
+                                          :trait-key :value})
     :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 100))})))

@@ -8,8 +8,7 @@
             [schema.core :as s]
 
             [search.core :as search]
-            [search.utils :refer [defnk-fn]]
-            [search.algorithms.base.evaluate :as evaluate]))
+            [search.utils :refer [defnk-fn]]))
 
 (def TestInput s/Any)
 (def TestOutput s/Any)
@@ -46,5 +45,4 @@
 (def graph
   (g/graph
     :test-output->trait-value (fnk [] difference-squared)
-    :genome->traits testcases->traits
-    :evaluate evaluate/genome->traits->))
+    :genome->traits testcases->traits))
