@@ -28,7 +28,7 @@
    :index s/Int
    :individuals #{Individual}})
 
-(def Wrapper [(s/one s/Symbol "fn") s/Any])
+(def Wrapper s/Any)
 
 (def Search
   "A search configuration is represented as a map. It contains all the data
@@ -40,25 +40,27 @@
 
    Then `values` are used to override keys with values.
 
-   The `wrapper-symbols` represent a sequence of functions that take in a graphs
-   and return an udpated graph. They are represented as `[fn-symbol & optional-args]`
-   and called like `((apply partial fn optional-args) graph)`. If any of the
-   args is a symbol, they are resolved into the value at that symbol. The leftmost
-   one is called first, like the thread macro."
+   The `wrapper-forms` represent a sequence of functions that take in a graph
+   and return an updated graph. Each one, when `eval`ed, should return a
+   function. All needed namespaces will be imported.
+
+   For example, if search.wrappers/log is function that takes a key and a graph
+   and returned an updated graph, the `wrapper-forms` could be
+   `[(partial search.wrappers/log :some-key)]`."
   {:graph-symbols [s/Symbol]
    :values {s/Keyword s/Any}
-   :wrapper-symbols [Wrapper]})
+   :wrapper-forms [Wrapper]})
 
 (def SearchID s/Str)
 (def SearchGraph (s/constrained utils/Graph #(contains? % :generations)))
 
 (defnk ->search :- Search
-  [{graph-symbols []}
+  [graph-symbols
    {values {}}
-   {wrapper-symbols []}]
+   {wrapper-forms []}]
   {:graph-symbols graph-symbols
    :values values
-   :wrapper-symbols wrapper-symbols})
+   :wrapper-forms wrapper-forms})
 
 (defn val->fnk
   "Returns a fnk that just returns the passed in value
@@ -81,19 +83,16 @@
                   (->> values
                     (plumbing.core/map-vals val->fnk)
                     g/graph))
-   :wrappers (fnk [wrapper-symbols :- [Wrapper]]
-              (let [opt-symbol->value #(if (symbol? %1) (utils/symbol->value %1) %1)]
-                (map (partial map opt-symbol->value) wrapper-symbols)))
-   :wrapper-fns (fnk [wrappers :- [s/Any]] (map #(apply partial (first %1) (rest %1)) wrappers))
-   :wrapper-fn (fnk [wrapper-fns :- [s/Any]] (apply comp (reverse wrapper-fns)))
+   :wrappers (fnk [wrapper-forms :- [Wrapper]] (map utils/eval-load-ns wrapper-forms))
+   :wrapper (fnk [wrappers :- [(s/=> utils/Graph utils/Graph)]] (apply comp (reverse wrappers)))
    :final-graph (fnk [default-graph :- utils/Graph
                       graph :- utils/Graph
                       values-graph :- utils/Graph
-                      wrapper-fn]
+                      wrapper :- (s/=> utils/Graph utils/Graph)]
                  (-> default-graph
                   (g/graph graph)
                   (merge values-graph)
-                  wrapper-fn))
+                  wrapper))
    :computed (fnk [final-graph :- SearchGraph search :- Search]
               (g/run final-graph {:search search}))))
 

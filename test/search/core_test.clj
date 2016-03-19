@@ -32,41 +32,36 @@
   [new-id g]
   (assoc g :search-id (fnk [] new-id)))
 
-(defn first-search-id
-  [search]
-  (-> search search/search->generations first :search-id))
+(defn is-first-search-id
+  [search-id search-args]
+  (is (= search-id (-> search-args search/->search search/search->generations first :search-id))))
 
 (deftest search->generations-test
   (testing "search-id"
     (with-redefs [utils/id (fn [] "test-id")]
-      (let [search_ {:graph-symbols [`search-id-graph]
-                     :values {}
-                     :wrapper-symbols []}]
-        (is (= "test-id" (first-search-id search_))))))
+      (is-first-search-id "test-id" {:graph-symbols [`search-id-graph]})))
 
   (testing "multiple graphs"
-    (let [search_ {:graph-symbols [`base-graph
-                                   `depends-on-base-graph]
-                   :values {}
-                   :wrapper-symbols []}]
-      (is (= "some value" (first-search-id search_)))))
+    (is-first-search-id "some value" {:graph-symbols [`base-graph
+                                                      `depends-on-base-graph]}))
 
   (testing "values override"
-    (let [search_ {:graph-symbols [`base-graph
-                                   `depends-on-base-graph]
-                   :values {:something "some other value"}
-                   :wrapper-symbols []}]
-      (is (= "some other value" (first-search-id search_)))))
+    (is-first-search-id
+      "some other value"
+      {:graph-symbols [`base-graph
+                       `depends-on-base-graph]
+       :values {:something "some other value"}}))
 
   (testing "values override map"
-    (let [search_ {:graph-symbols [`takes-map-graph]
-                   :values {:some-map {:search-id "yeah"}}
-                   :wrapper-symbols []}]
-      (is (= "yeah" (first-search-id search_)))))
+    (is-first-search-id
+      "yeah"
+      {:graph-symbols [`takes-map-graph]
+       :values {:some-map {:search-id "yeah"}}}))
 
   (testing "multiple wrappers"
-    (let [search_ {:graph-symbols [`search-id-graph]
-                   :values {}
-                   :wrapper-symbols [[`change-search-id "first"]
-                                     [`change-search-id "second"]]}]
-      (is (= "second" (first-search-id search_))))))
+    (is-first-search-id
+      "second"
+      {:graph-symbols [`search-id-graph]
+       :wrapper-forms `[(partial change-search-id "first")
+                        (partial change-search-id "second")
+                        identity]})))

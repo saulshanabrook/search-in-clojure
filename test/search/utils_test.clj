@@ -170,3 +170,11 @@
     ; resaulting fn should be wrapped
     (is-same-schema orig-f (:f ran))
     (is (= "hello[:f]" ((:f ran) {})))))
+
+(def some-var 3)
+
+(deftest eval-load-ns-test
+  (is (= 1 (utils/eval-load-ns 1)))
+  (is (= 3 (utils/eval-load-ns `some-var)))
+  (is (thrown? Exception (utils/eval-load-ns 'some-madeup-ns/dfd)))
+  (is (utils/eval-load-ns 'search.core-test/search->generations-test)))

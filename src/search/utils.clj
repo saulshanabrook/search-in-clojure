@@ -189,3 +189,20 @@
             (fn-wrapper {:f res :ks ks})
             res))))
     g))
+
+(defn eval-load-ns
+  "Evaluates the data structure, and will attempt to load any namespaces needed
+   by handling `ClassNotFoundException` exceptions."
+  [form]
+  (loop [namespaces #{}]
+    (doall (map require namespaces))
+    (let [[res e] (try [(eval form) nil] (catch Exception e [nil e]))]
+      (or
+        res
+        (let [emap (Throwable->map e)
+              class-not-found? (= java.lang.ClassNotFoundException (some-> emap :via second :type))
+              namespace (-> emap :cause symbol)
+              already-required? (namespaces namespace)]
+          (when-not (and class-not-found? (not already-required?))
+            (throw e))
+          (recur (conj namespaces namespace)))))))
