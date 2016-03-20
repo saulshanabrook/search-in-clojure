@@ -11,12 +11,11 @@
 
 (defnk-fn ->instruction :- s/Any
   "Returns a random push instruction from those defined in the `push-interpreter`
-   and the bindings names. Choose a push instruction half the time and a bindings
-   half the time, if any exist`"
+   and the bindings names.`"
   [interpreter]
   []
   (let [bindings (push/binding-names interpreter)]
-    (-> {(push/known-instructions interpreter) 1
+    (-> {(push/known-instructions interpreter) 5
          bindings (if (empty? bindings) 0 1)}
       clojure.data.generators/weighted
       clojure.data.generators/rand-nth)))
