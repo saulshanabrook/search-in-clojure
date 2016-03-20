@@ -1,11 +1,11 @@
-(ns search.algorithms.seq
+(ns search.graphs.seq
   (:require [schema.core :as s]
             [clojure.data.generators]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
             [search.utils :refer [defnk-fn] :as utils]
-            [search.algorithms.base.step :as step]))
+            [search.graphs.base.step :as step]))
 
 
 (def Gene s/Any)

@@ -1,11 +1,11 @@
-(ns search.algorithms.base.evaluate-test
+(ns search.graphs.base.evaluate-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
             [com.rpl.specter :as sp]
 
             [search.core :as search]
-            [search.algorithms.base.evaluate :as evaluate]))
+            [search.graphs.base.evaluate :as evaluate]))
 (use-fixtures :once schema.test/validate-schemas)
 
 (deftest genome->traits->-test

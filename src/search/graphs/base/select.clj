@@ -1,4 +1,4 @@
-(ns search.algorithms.base.select
+(ns search.graphs.base.select
   (:require [schema.core :as s]
             [clojure.data.generators]
             [plumbing.core :refer [defnk]]

@@ -1,10 +1,10 @@
-(ns search.algorithms.base.select-test
+(ns search.graphs.base.select-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
 
             [search.core :as search]
-            [search.algorithms.base.select :as select]))
+            [search.graphs.base.select :as select]))
 
 (use-fixtures :once schema.test/validate-schemas)
 

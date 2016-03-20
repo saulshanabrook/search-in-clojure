@@ -1,4 +1,4 @@
-(ns search.algorithms.base.core-test
+(ns search.graphs.base.core-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
@@ -6,7 +6,7 @@
             [com.rpl.specter :as sp]
 
             [search.core :as search]
-            [search.algorithms.base.core :as base]))
+            [search.graphs.base.core :as base]))
 (use-fixtures :once schema.test/validate-schemas)
 
 ; defined globally so that instrumenting works on it

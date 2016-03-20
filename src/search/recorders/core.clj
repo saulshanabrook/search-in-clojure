@@ -3,7 +3,7 @@
             [plumbing.fnk.pfnk :as pfnk]
 
             [search.core :as search]
-            [search.algorithms.base.select :as select]
+            [search.graphs.base.select :as select]
             [search.utils :as utils]))
 
 (def Metadata

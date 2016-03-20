@@ -1,4 +1,4 @@
-(ns search.algorithms.base.evaluate
+(ns search.graphs.base.evaluate
   (:require [schema.core :as s]
 
             [search.core :as search]

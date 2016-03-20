@@ -1,4 +1,4 @@
-(ns search.algorithms.base.step
+(ns search.graphs.base.step
   (:require [schema.core :as s]
             [plumbing.core :refer [defnk]]
 

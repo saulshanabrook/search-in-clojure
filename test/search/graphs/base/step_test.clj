@@ -1,10 +1,10 @@
-(ns search.algorithms.base.step-test
+(ns search.graphs.base.step-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
 
             [search.core :as search]
-            [search.algorithms.base.step :as step]
+            [search.graphs.base.step :as step]
             [search.utils :as utils]))
 (use-fixtures :once schema.test/validate-schemas)
 

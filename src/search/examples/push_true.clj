@@ -5,9 +5,9 @@
             [plumbing.core :refer [fnk]]
 
             [search.utils :refer [defnk-fn] :as utils]
-            [search.algorithms.base.done :as done]
-            [search.algorithms.base.select :as select]
-            [search.algorithms.push :as push]))
+            [search.graphs.base.done :as done]
+            [search.graphs.base.select :as select]
+            [search.graphs.push :as push]))
 
 (defnk-fn genome->traits :- s/Any
   "Whether the returned value is `true`"

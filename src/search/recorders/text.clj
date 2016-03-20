@@ -4,7 +4,7 @@
             [puget.printer :as puget]
 
             [search.core :as search]
-            [search.algorithms.base.select :as select]
+            [search.graphs.base.select :as select]
             [search.recorders.core :refer [Recorder Metadata]]))
 
 (s/def timbre :- Recorder

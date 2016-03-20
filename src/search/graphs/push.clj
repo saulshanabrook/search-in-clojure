@@ -1,4 +1,4 @@
-(ns search.algorithms.push
+(ns search.graphs.push
   (:require [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
             [push.core :as push]
@@ -7,7 +7,7 @@
             [clojure.data.generators]
 
             [search.utils :refer [defnk-fn]]
-            [search.algorithms.seq :as seq]))
+            [search.graphs.seq :as seq]))
 
 (defnk-fn ->instruction :- s/Any
   "Returns a random push instruction from those defined in the `push-interpreter`

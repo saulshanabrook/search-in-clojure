@@ -1,12 +1,12 @@
-(ns search.algorithms.genetic
+(ns search.graphs.genetic
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.algorithms.base.core :as base]
-            [search.algorithms.base.initial :as initial]
-            [search.algorithms.base.step :as step]
-            [search.algorithms.base.evaluate :as evaluate]))
+            [search.graphs.base.core :as base]
+            [search.graphs.base.initial :as initial]
+            [search.graphs.base.step :as step]
+            [search.graphs.base.evaluate :as evaluate]))
 
 
 (def graph

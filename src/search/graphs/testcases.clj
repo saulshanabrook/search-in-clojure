@@ -1,4 +1,4 @@
-(ns search.algorithms.testcases
+(ns search.graphs.testcases
   "Graph parts to facilitate using multiple test cases to evaluate your genomes.
 
   For example, if you are trying to evolve a function, like y=x^2, to evaluate

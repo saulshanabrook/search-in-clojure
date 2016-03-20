@@ -1,8 +1,8 @@
-(ns search.algorithms.testcases-test
+(ns search.graphs.testcases-test
   (:require [clojure.test :refer :all]
             [schema.test]
 
-            [search.algorithms.testcases :as testcases]))
+            [search.graphs.testcases :as testcases]))
 (use-fixtures :once schema.test/validate-schemas)
 
 

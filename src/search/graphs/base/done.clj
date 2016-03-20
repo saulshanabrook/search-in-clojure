@@ -1,4 +1,4 @@
-(ns search.algorithms.base.done
+(ns search.graphs.base.done
   "Partial graphs that provide the `done` function. "
   (:require [schema.core :as s]
 

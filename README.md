@@ -84,7 +84,7 @@ a function that takes in a run ID and returns a sequence of generations.
 
 This makes the configuration extremely flexible. There are core paths for things
 like `mutate` or `fitness`. Instead, you can use a bunch of building blocks
-(in [`search.algorithms.base`](./src/search/algorithms/base)) to create it.
+(in [`search.graphs.base`](./src/search/algorithms/base)) to create it.
 
 However, I wanted configurations to be serializable (in a human readable format)
 so that if you did a run and it was recorded in a central data store, I could
@@ -109,7 +109,7 @@ a path somewhere else in the config file. This facilitates creating multiple
 configuration pieces that each use different algorithms but expect the `mutate`
 and `->genome` functions to be in the same place in your configuration.
 
-For a simple example, look at `search.algorithms.config/hill-climb-algorithm`
+For a simple example, look at `search.graphs.config/hill-climb-algorithm`
 that is used in `search.examples.list/config`.
 
 
@@ -135,7 +135,7 @@ population size and a new individual function and return an `Initial` function
 that returns the whole first generation.
 
 I have made a generalization of most algorithms in the
-`search.algorithms.base.core/->algorithm` function. One possibility is just to
+`search.graphs.base.core/->algorithm` function. One possibility is just to
 run with this option and move it into core, forcing all algorithms to behave
 like this.
 

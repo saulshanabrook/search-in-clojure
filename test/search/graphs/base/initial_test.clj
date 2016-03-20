@@ -1,8 +1,8 @@
-(ns search.algorithms.base.initial-test
+(ns search.graphs.base.initial-test
   (:require [clojure.test :refer :all]
             [schema.test]
 
-            [search.algorithms.base.initial :as initial]
+            [search.graphs.base.initial :as initial]
             [search.utils :as utils]))
 (use-fixtures :once schema.test/validate-schemas)
 

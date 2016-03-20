@@ -1,4 +1,4 @@
-(ns search.algorithms.base.initial
+(ns search.graphs.base.initial
   (:require [schema.core :as s]
             [plumbing.core :refer [defnk]]
 

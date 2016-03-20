@@ -4,9 +4,9 @@
             [plumbing.core :refer [fnk]]
 
             [search.utils :as utils]
-            [search.algorithms.base.select :as select]
-            [search.algorithms.seq :as seq]
-            [search.algorithms.base.done :as done]))
+            [search.graphs.base.select :as select]
+            [search.graphs.seq :as seq]
+            [search.graphs.base.done :as done]))
 
 (def Gene s/Int)
 (def Genome [Gene])

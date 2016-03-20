@@ -1,10 +1,10 @@
-(ns search.algorithms.base.done-test
+(ns search.graphs.base.done-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
 
             [search.core :as search]
-            [search.algorithms.base.done :as done]))
+            [search.graphs.base.done :as done]))
 (use-fixtures :once schema.test/validate-schemas)
 
 (deftest max-generations-test

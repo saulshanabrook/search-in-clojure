@@ -1,9 +1,9 @@
-(ns search.algorithms.seq-test
+(ns search.graphs.seq-test
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
 
-            [search.algorithms.seq :as seq]))
+            [search.graphs.seq :as seq]))
 (use-fixtures :once schema.test/validate-schemas)
 
 

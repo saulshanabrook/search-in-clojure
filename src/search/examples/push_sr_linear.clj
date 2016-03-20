@@ -8,10 +8,10 @@
 
 
             [search.utils :refer [defnk-fn] :as utils]
-            [search.algorithms.base.done :as done]
-            [search.algorithms.base.select :as select]
-            [search.algorithms.testcases :as testcases]
-            [search.algorithms.push :as push]))
+            [search.graphs.base.done :as done]
+            [search.graphs.base.select :as select]
+            [search.graphs.testcases :as testcases]
+            [search.graphs.push :as push]))
 
 (def x (range 0 20))
 ; y = 2x
