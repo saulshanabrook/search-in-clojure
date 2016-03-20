@@ -1,4 +1,4 @@
-(ns search.examples.list
+(ns search.problems.list
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]

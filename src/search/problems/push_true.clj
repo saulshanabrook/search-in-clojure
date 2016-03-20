@@ -1,4 +1,4 @@
-(ns search.examples.push-true
+(ns search.problems.push-true
   "Make a push program that returns the true"
   (:require [schema.core :as s]
             [plumbing.graph :as g]

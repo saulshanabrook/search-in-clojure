@@ -1,4 +1,4 @@
-(ns search.examples.push-sr-linear
+(ns search.problems.push-sr-linear
   "Make a push program that performs linear symbolic regression"
   (:require [schema.core :as s]
             [plumbing.graph :as g]
