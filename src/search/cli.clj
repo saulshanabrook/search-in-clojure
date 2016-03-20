@@ -53,4 +53,4 @@
     (-> options
       (select-keys (keys search/Search))
       search/search->generations
-      doall)))
+      dorun)))
