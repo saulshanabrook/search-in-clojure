@@ -78,3 +78,24 @@
                   :trait-key trait-key
                   :trait-spec trait-spec}))
    (-> trait-specs seq clojure.data.generators/shuffle cycle)))
+
+(s/defn sum-of-squares :- (s/maybe s/Num)
+  "Returns the sum of the squared values or `nil` if any are `nil`."
+  [xs :- [(s/maybe s/Num)]]
+  (try
+    (reduce + (map #(* %1 %1) xs))
+    (catch NullPointerException _ nil)))
+
+(s/defn less-than-null
+  "Like `<`, but always returns false when the first is nil
+   and true if the second is nil"
+  [a b]
+  (cond
+    (nil? a) false
+    (nil? b) true
+    :else (< a b)))
+
+(s/defn least-sum-squares :- s/Any
+  "Orders the individuals by the sum of their square traits and chooses the least"
+  [inds :- #{search/Individual}]
+  (cycle (sort-by #(->> % :traits vals sum-of-squares) (comparator less-than-null) inds)))

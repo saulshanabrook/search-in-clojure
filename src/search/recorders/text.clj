@@ -37,3 +37,11 @@
                        {individuals :individuals} :- search/Generation]
                   (println (get-best-traits trait-specs individuals)))
    :done! (fn [_] nil)})
+
+(s/def smallest-least-squared-ind
+  "Prints the individual with the traits that are the closest to 0, by summing
+   the squares"
+   {:started! (fn [md] (puget/cprint md))
+    :generation! (s/fn [_ {inds :individuals} :- search/Generation]
+                   (puget/cprint (first (select/least-sum-squares inds))))
+    :done! (fn [_] nil)})
