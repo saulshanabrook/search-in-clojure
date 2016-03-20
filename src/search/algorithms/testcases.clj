@@ -37,10 +37,13 @@
       [t-in
        (test-output->trait-value t-out (test-fn genome t-in))])))
 
-(defn difference-squared
-  [a b]
-  (let [diff (- a b)]
-    (* diff diff)))
+(s/defn difference-squared :- (s/maybe s/Num)
+  [a :- (s/maybe s/Num)
+   b :- (s/maybe s/Num)]
+  (try
+    (let [diff (- a b)]
+      (* diff diff))
+    (catch NullPointerException _ nil)))
 
 (def graph
   (g/graph

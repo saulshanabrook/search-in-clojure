@@ -7,7 +7,7 @@
             [search.utils :refer [defnk-fn] :as utils]))
 
 (s/defn invert-list :- [long]
-  "Takes a list of longs and inverts them all and multiplies them by the highest
+  "Takes a list of integers and inverts them all and multiplies them by the highest
    number to return a list of longs"
   [xs :- [s/Int]]
   (let [max_ (apply max xs)]
@@ -32,6 +32,19 @@
                   (into {}))]
     (repeatedly (partial clojure.data.generators/weighted weights))))
 
+(def max-num Float/MAX_VALUE)
+(def min-num Float/MIN_VALUE)
+
+(defn min-key-null
+  "Same as, min-key, but handles nil values"
+  [k & args]
+  (apply min-key (comp #(if (nil? %1) max-num %1) k) args))
+
+(defn max-key-null
+  "Same as, max-key, but handles nil values"
+  [k & args]
+  (apply max-key (comp #(if (nil? %1) min-num %1) k) args))
+
 (defnk best-trait :- search/Individual
   [inds :- #{search/Individual}
    trait-key :- search/TraitKey
@@ -39,8 +52,8 @@
   "Returns best individual according the `trait-key` trait."
   (apply
    (partial
-     (if (:lowest? trait-spec) min-key max-key)
-     (comp trait-key :traits))
+     (if (:lowest? trait-spec) min-key-null max-key-null)
+     #(get-in % [:traits trait-key]))
    inds))
 
 (defnk-fn dominates :- s/Any ; :- s(utils/InfSeq search/Individual)

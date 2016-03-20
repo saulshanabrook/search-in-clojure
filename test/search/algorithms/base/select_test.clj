@@ -38,8 +38,8 @@
 
 (deftest lexicase-test
   (let [->ind #(assoc (g/generate search/Individual) :traits %)
-        high-a (->ind {:a 1 :b 1})
-        low-b (->ind {:a 0 :b 0})]
+        high-a (->ind {:a 1 :b nil})
+        low-b (->ind {:a nil :b 0})]
     (with-redefs [clojure.data.generators/shuffle sort]
       (is (=
            [high-a low-b high-a]
