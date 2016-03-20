@@ -1,6 +1,5 @@
 (ns search.algorithms.base.evaluate
   (:require [schema.core :as s]
-            [com.rpl.specter :as sp]
 
             [search.core :as search]
             [search.utils :refer [defnk-fn]]))
@@ -10,7 +9,10 @@
    based on its genome"
   [genome->traits :- (s/=> search/Traits search/Genome)]
   [generation :- search/Generation]
-  (sp/compiled-transform
-    (sp/comp-paths :individuals sp/ALL (sp/collect-one :genome) :traits)
-    (fn [genome _] (genome->traits genome))
-    generation))
+  (assoc generation :individuals
+    (set
+      (pmap
+        (fn [ind]
+          (let [traits (-> ind :genome genome->traits)]
+            (assoc ind :traits traits)))
+        (generation :individuals)))))
