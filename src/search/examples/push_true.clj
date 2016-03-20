@@ -4,7 +4,7 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.utils :refer [defnk-fn]]
+            [search.utils :refer [defnk-fn] :as utils]
             [search.algorithms.base.done :as done]
             [search.algorithms.base.select :as select]
             [search.algorithms.push :as push]))
@@ -19,6 +19,6 @@
   (g/graph
     (g/instance push/graph {:output-stack :boolean})
     :genome->traits genome->traits
-    :select (g/instance select/roulette {:trait-specs {:value {:lowest? false}}
-                                         :trait-key :value})
+    :trait-specs (utils/v->fnk {:value {:lowest? false}})
+    :select (g/instance select/roulette {:trait-key :value})
     :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 1))})))

@@ -9,17 +9,16 @@
 (def cli-options
   [["-s" "--validate-schema" "Turn on schema validation. Will likely be slower."]
    ["-g" "--graphs [path.graph/1 path.graph/2]" "Paths to the graphs to use"
-    :default []
     :id :graph-symbols
     :parse-fn read-string]
    ["-v" "--values {:value-1}" "Graph overrides"
     :default {}
     :id :values
     :parse-fn read-string]
-   ["-w" "--wrappers [[path.to/wrapper \"wrapper-arg\"] [path.to/other]]"
+   ["-w" "--wrappers [(partial path.to/wrapper \"wrapper-arg\"] path.to/other]"
     "Wrap the graph with these functions, from left to right."
     :default []
-    :id :wrapper-symbols
+    :id :wrapper-forms
     :parse-fn read-string]
    ["-h" "--help"]])
 

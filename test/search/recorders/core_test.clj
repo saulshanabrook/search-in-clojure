@@ -8,7 +8,6 @@
 
             [search.recorders.core :as recorders]
             [search.utils :as utils]
-            [search.algorithms.base.select :as select]
             [search.core :as search]))
 
 (use-fixtures :once schema.test/validate-schemas)
