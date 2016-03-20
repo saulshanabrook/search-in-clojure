@@ -1,4 +1,4 @@
-(ns search.graphs.genetic
+(ns search.graphs.algorithms.genetic
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]

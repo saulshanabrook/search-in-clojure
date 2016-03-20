@@ -1,11 +1,11 @@
-(ns search.graphs.hill-climb-test
+(ns search.graphs.algorithms.hill-climb-test
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
 
             [search.core :as search]
-            [search.graphs.test-utils :refer [is-algorithm]]
-            [search.graphs.hill-climb :as hill-climb]))
+            [search.graphs.algorithms.test-utils :refer [is-algorithm]]
+            [search.graphs.algorithms.hill-climb :as hill-climb]))
 
 (use-fixtures :once schema.test/validate-schemas)
 

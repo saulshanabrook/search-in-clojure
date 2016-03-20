@@ -1,4 +1,4 @@
-(ns search.graphs.test-utils
+(ns search.graphs.algorithms.test-utils
   (:require [clojure.test :refer [is]]
             [plumbing.fnk.pfnk]
             [plumbing.fnk.schema]))

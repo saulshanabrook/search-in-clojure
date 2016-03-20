@@ -1,11 +1,11 @@
-(ns search.graphs.genetic-test
+(ns search.graphs.algorithms.genetic-test
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
 
             [search.core :as search]
-            [search.graphs.test-utils :refer [is-algorithm]]
-            [search.graphs.genetic :as genetic]))
+            [search.graphs.algorithms.test-utils :refer [is-algorithm]]
+            [search.graphs.algorithms.genetic :as genetic]))
 
 (use-fixtures :once schema.test/validate-schemas)
 

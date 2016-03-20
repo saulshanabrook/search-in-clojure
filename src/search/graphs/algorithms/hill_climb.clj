@@ -1,4 +1,4 @@
-(ns search.graphs.hill-climb
+(ns search.graphs.algorithms.hill-climb
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]

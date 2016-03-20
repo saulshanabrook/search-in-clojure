@@ -15,13 +15,13 @@
       seq)))
 
 (deftest list-hill-climb-test
-  (finishes ['search.examples.list/graph 'search.graphs.hill-climb/graph]))
+  (finishes ['search.examples.list/graph 'search.graphs.algorithms.hill-climb/graph]))
 
 (deftest list-genetic-algorithm-test
-  (finishes ['search.examples.list/graph 'search.graphs.genetic/graph]))
+  (finishes ['search.examples.list/graph 'search.graphs.algorithms.genetic/graph]))
 
 (deftest push-true-test
-  (finishes ['search.examples.push-true/graph 'search.graphs.genetic/graph]))
+  (finishes ['search.examples.push-true/graph 'search.graphs.algorithms.genetic/graph]))
 
 (deftest push-sr-linear-test
-  (finishes ['search.examples.push-sr-linear/graph 'search.graphs.genetic/graph]))
+  (finishes ['search.examples.push-sr-linear/graph 'search.graphs.algorithms.genetic/graph]))
