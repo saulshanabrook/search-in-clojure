@@ -35,7 +35,8 @@
             ;  :config-files ["eastwood.clj"]
              :exclude-linters [:unused-locals ; warns with defnk-fn macro
                                :keyword-typos ; warns on graph definitions in core
-                               :unused-ret-vals]} ; warns when `(apply <non-pure-function> args)`
+                               :unused-ret-vals ; warns when `(apply <non-pure-function> args)`
+                               :constant-test]} ; warns on timbre profiling macro
   :codox {:source-uri "http://github.com/saulshanabrook/search-in-clojure/blob/master/{filepath}#L{line}"
           :output-path "doc"
           :metadata {:doc/format :markdown}}
