@@ -1,4 +1,4 @@
-(ns search.graph-utils
+(ns search.wrappers.graph
   (:require [schema.core :as s]
             [plumbing.core :refer [fnk]]
             [taoensso.timbre.profiling :as profiling]

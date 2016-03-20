@@ -1,11 +1,11 @@
-(ns search.graph-utils-test
+(ns search.wrappers.graph-test
   (:require [clojure.test :refer :all]
             [schema.test]
             [conjure.core :as conjure]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.graph-utils :as graph-utils]))
+            [search.wrappers.graph :as graph-utils]))
 
 (use-fixtures :once schema.test/validate-schemas)
 

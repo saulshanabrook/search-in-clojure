@@ -1,4 +1,4 @@
-(ns search.recorders.core-test
+(ns search.wrappers.recorders-test
   (:require [clojure.test :refer :all]
             [conjure.core :as conjure]
             [schema.test]
@@ -6,7 +6,7 @@
             [schema.experimental.generators :as g]
             [plumbing.graph]
 
-            [search.recorders.core :as recorders]
+            [search.wrappers.recorders :as recorders]
             [search.utils :as utils]
             [search.core :as search]))
 
