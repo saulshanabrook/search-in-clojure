@@ -1,4 +1,4 @@
-(ns search.problems-test
+(ns search.graphs.problems-test
   (:require [clojure.test :refer :all]
             [schema.test]
 
@@ -15,13 +15,13 @@
       seq)))
 
 (deftest list-hill-climb-test
-  (finishes ['search.problems.list/graph 'search.graphs.algorithms.hill-climb/graph]))
+  (finishes ['search.graphs.problems.list/graph 'search.graphs.algorithms.hill-climb/graph]))
 
 (deftest list-genetic-algorithm-test
-  (finishes ['search.problems.list/graph 'search.graphs.algorithms.genetic/graph]))
+  (finishes ['search.graphs.problems.list/graph 'search.graphs.algorithms.genetic/graph]))
 
 (deftest push-true-test
-  (finishes ['search.problems.push-true/graph 'search.graphs.algorithms.genetic/graph]))
+  (finishes ['search.graphs.problems.push-true/graph 'search.graphs.algorithms.genetic/graph]))
 
 (deftest push-sr-linear-test
-  (finishes ['search.problems.push-sr-linear/graph 'search.graphs.algorithms.genetic/graph]))
+  (finishes ['search.graphs.problems.push-sr-linear/graph 'search.graphs.algorithms.genetic/graph]))

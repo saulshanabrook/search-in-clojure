@@ -12,9 +12,9 @@ This README is not complete yet and the bottom is out of date.
 ## Quickstart
 
 ```bash
-lein run search.recorders.text/timbre search.problems.list/hill-climb-config
+lein run search.recorders.text/timbre search.graphs.problems.list/hill-climb-config
 
-lein trampoline run search.recorders.text/min-distance search.problems.push-saul/genetic-config
+lein trampoline run search.recorders.text/min-distance search.graphs.problems.push-saul/genetic-config
 ```
 
 
@@ -110,7 +110,7 @@ configuration pieces that each use different algorithms but expect the `mutate`
 and `->genome` functions to be in the same place in your configuration.
 
 For a simple example, look at `search.graphs.config/hill-climb-algorithm`
-that is used in `search.problems.list/config`.
+that is used in `search.graphs.problems.list/config`.
 
 
 #### Criticism of config
