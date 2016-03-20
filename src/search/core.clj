@@ -24,8 +24,7 @@
 
 (def Generation
   "Holds the whole state for a current generation of individuals."
-  {:search-id s/Str
-   :index s/Int
+  {:index s/Int
    :individuals #{Individual}})
 
 (def Wrapper s/Any)
@@ -64,7 +63,9 @@
 
 (def compute-search-graph
   (g/graph
-   :default-graph (fnk [] (hash-map :search-id (fnk [] (utils/id))))
+   :default-graph (fnk [graph-symbols values wrapper-forms :as s]
+                   {:id (fnk [] (utils/id))
+                    :search (utils/v->fnk s)})
    :graphs (fnk [graph-symbols :- [s/Symbol]] (map utils/symbol->value graph-symbols))
    :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
    :values-graph (fnk [values :- {s/Keyword s/Any}]
@@ -81,8 +82,7 @@
                   (g/graph graph)
                   (merge values-graph)
                   wrapper))
-   :computed (fnk [final-graph :- SearchGraph search :- Search]
-              (g/run final-graph {:search search}))))
+   :computed (fnk [final-graph :- SearchGraph] (g/run final-graph {}))))
 
 (def compute-search (g/compile compute-search-graph))
 
@@ -91,7 +91,6 @@
   lazy sequence of generations. The computation happens when you resolve them."
   [search :- Search]
   (-> search
-    (assoc :search search)
     compute-search
     :computed
     :generations))

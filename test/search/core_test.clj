@@ -9,59 +9,60 @@
 
 (use-fixtures :once schema.test/validate-schemas)
 
-(defn gens-with-search-id
-  [search-id]
-  (repeatedly #(->
-                search/Generation
-                g/generate
-                (assoc :search-id search-id))))
+(def generation (g/generate search/Generation))
 
-(def search-id-graph
-  {:generations (fnk [search-id] (gens-with-search-id search-id))})
+(def simple-graph
+  {:generations (fnk [] (repeat generation))})
 
 (def base-graph
-  {:something (fnk [] "some value")})
+  {:something (fnk [] generation)})
 
 (def depends-on-base-graph
-  {:generations (fnk [something] (gens-with-search-id something))})
+  {:generations (fnk [something] (repeat something))})
 
 (def takes-map-graph
-  {:generations (fnk [some-map :- {:search-id search/SearchID}] (gens-with-search-id (:search-id some-map)))})
+  {:generations (fnk [some-map :- {:generation search/Generation}]
+                 (repeat (some-map :generation)))})
 
-(defn change-search-id
-  [new-id g]
-  (assoc g :search-id (fnk [] new-id)))
+(defn change-something
+  [generation g]
+  (assoc g :something (utils/v->fnk generation)))
 
-(defn is-first-search-id
-  [search-id search-args]
-  (is (= search-id (-> search-args search/->search search/search->generations first :search-id))))
+(defn is-first-generation
+  [generation search-args]
+  (is (= generation (-> search-args search/->search search/search->generations first))))
 
 (deftest search->generations-test
-  (testing "search-id"
-    (with-redefs [utils/id (fn [] "test-id")]
-      (is-first-search-id "test-id" {:graph-symbols [`search-id-graph]})))
+  (testing "one graph"
+    (is-first-generation
+      generation
+      {:graph-symbols [`simple-graph]}))
 
   (testing "multiple graphs"
-    (is-first-search-id "some value" {:graph-symbols [`base-graph
-                                                      `depends-on-base-graph]}))
+    (is-first-generation
+      generation
+      {:graph-symbols [`base-graph
+                       `depends-on-base-graph]}))
 
   (testing "values override"
-    (is-first-search-id
-      "some other value"
-      {:graph-symbols [`base-graph
-                       `depends-on-base-graph]
-       :values {:something "some other value"}}))
+    (let [other-gen (g/generate search/Generation)]
+      (is-first-generation
+        other-gen
+        {:graph-symbols [`base-graph
+                         `depends-on-base-graph]
+         :values {:something other-gen}})))
 
   (testing "values override map"
-    (is-first-search-id
-      "yeah"
+    (is-first-generation
+      generation
       {:graph-symbols [`takes-map-graph]
-       :values {:some-map {:search-id "yeah"}}}))
+       :values {:some-map {:generation generation}}}))
 
   (testing "multiple wrappers"
-    (is-first-search-id
-      "second"
-      {:graph-symbols [`search-id-graph]
-       :wrapper-forms `[(partial change-search-id "first")
-                        (partial change-search-id "second")
-                        identity]})))
+    (let [other-gen (g/generate search/Generation)]
+      (is-first-generation
+        other-gen
+        {:graph-symbols [`depends-on-base-graph]
+         :wrapper-forms `[(partial change-something '~(g/generate search/Generation))
+                          (partial change-something '~other-gen)
+                          identity]}))))

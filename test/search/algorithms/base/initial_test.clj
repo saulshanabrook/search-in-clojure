@@ -8,12 +8,10 @@
 
 
 (deftest ->genome-test
-  (let [n 3
-        search-id "_"]
+  (let [n 3]
     (with-redefs [utils/id (utils/seq->fn (cycle ["0" "1" "2"]))]
       (is (=
            {:index 0
-            :search-id search-id
             :individuals (utils/repeatedly-set
                           n
                           (fn []
@@ -22,5 +20,4 @@
                              :parents-ids #{}
                              :traits {}}))}
            (initial/->genome-> {:->genome (fn [] :test)
-                                :n n
-                                :search-id search-id}))))))
+                                :n n}))))))

@@ -191,6 +191,17 @@
             res))))
     g))
 
+; (s/defn wrap-graph-node :- Graph
+;   "Wraps a node in a graph.
+;
+;   `wrap` should be a fnk that takes in any new inputs it needs from the graph
+;   and returns a new graph"
+;   [g :- utils/Graph
+;    key :- s/Keyword
+;    wrap])
+
+
+
 (defn eval-load-ns
   "Evaluates the data structure, and will attempt to load any namespaces needed
    by handling `ClassNotFoundException` exceptions."

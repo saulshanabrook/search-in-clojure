@@ -12,7 +12,6 @@
    breed :- (s/=> [search/Individual] search/Generation)]
   [generation :- search/Generation]
   {:index       (inc (:index generation))
-   :search-id      (:search-id generation)
    :individuals (utils/take-set n (breed generation))})
 
 (def Tweak {:f (s/=> (s/cond-pre [search/Genome] search/Genome) & [search/Genome])

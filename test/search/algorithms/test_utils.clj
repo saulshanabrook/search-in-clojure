@@ -15,9 +15,8 @@
   ;                s/Keyword s/Any}
   ;                 inputs)
   ;        (pfnk/input-schema g))))
-  (is (= (set (conj (keys inputs) :search-id))
-         (->
-          g
+  (is (= (set (keys inputs))
+         (-> g
           plumbing.fnk.pfnk/input-schema
           plumbing.fnk.schema/explicit-schema-key-map
           keys
