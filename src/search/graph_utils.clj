@@ -42,8 +42,7 @@
       (fn [m]
         (let [f (fn profile-fns-inner [gens]
                   (let [first-g (profiling/profile :info :Generation (first gens))]
-                    (if (nil? first-g)
-                      nil
+                    (when-not (nil? first-g)
                       (lazy-seq (cons first-g
                                       (profile-fns-inner (rest gens)))))))]
           (f (->gens m)))))))

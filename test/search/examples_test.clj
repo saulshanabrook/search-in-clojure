@@ -22,3 +22,6 @@
 
 (deftest push-true-test
   (finishes ['search.examples.push-true/graph 'search.algorithms.genetic/graph]))
+
+(deftest push-sr-linear-test
+  (finishes ['search.examples.push-sr-linear/graph 'search.algorithms.genetic/graph]))

@@ -4,20 +4,22 @@
             [push.core :as push]
             [schema.core :as s]
             [push.interpreter.templates.one-with-everything :refer [make-everything-interpreter]]
+            [clojure.data.generators]
 
             [search.utils :refer [defnk-fn]]
             [search.algorithms.seq :as seq]))
 
 (defnk-fn ->instruction :- s/Any
   "Returns a random push instruction from those defined in the `push-interpreter`
-   plus the `extra-instructions`"
-  [interpreter
-   extra-instructions :- #{s/Any}]
+   and the bindings names. Choose a push instruction half the time and a bindings
+   half the time, if any exist`"
+  [interpreter]
   []
-  (rand-nth (concat
-             (push/known-instructions interpreter)
-             (push/binding-names interpreter)
-             extra-instructions)))
+  (let [bindings (push/binding-names interpreter)]
+    (-> {(push/known-instructions interpreter) 1
+         bindings (if (empty? bindings) 0 1)}
+      clojure.data.generators/weighted
+      clojure.data.generators/rand-nth)))
 
 (defnk-fn evaluate :- s/Any
   "Get the value off the `output-stack` by running the `program` with the bindings
@@ -32,9 +34,8 @@
 
 (def graph
   (g/graph
-    :extra-instructions (fnk [] #{})
     :step-limit (fnk [] 500)
     :interpreter (fnk [] (make-everything-interpreter))
     :push-evaluate evaluate
     :->gene ->instruction
-    (g/instance seq/graph {:n-genes 50})))
+    seq/graph))

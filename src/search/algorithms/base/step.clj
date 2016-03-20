@@ -57,7 +57,7 @@
    tweak-weights :- {s/Keyword s/Int}]
   []
   (do
-    (assert (= (keys tweaks) (keys tweak-weights)))
+    (assert (apply clojure.set/subset? (map (comp set keys) [tweak-weights tweaks])))
     (->
       tweak-weights
       clojure.data.generators/weighted

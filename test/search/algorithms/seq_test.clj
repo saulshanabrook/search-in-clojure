@@ -9,7 +9,7 @@
 
 (deftest ->genome-test
   (let [val (atom 0)
-        ->genome (seq/->genome {:n 3
+        ->genome (seq/->genome {:n-genes 3
                                 :->gene #(swap! val inc)})]
     (is (= [1 2 3] (->genome)))))
 

@@ -12,11 +12,11 @@
 (def Genome [Gene])
 
 (defnk-fn ->genome :- Genome
-  "Creates an initial genome by creating `n` genes, from `->gene`"
+  "Creates an initial genome by creating `n-genes` genes, from `->gene`"
   [->gene :- (s/=> Gene)
-   n :- s/Int]
+   n-genes :- s/Int]
   []
-  (repeatedly n ->gene))
+  (repeatedly n-genes ->gene))
 
 
 (defnk-fn mutate :- Genome
@@ -46,23 +46,44 @@
     [(concat (first first-split) (second second-split))
      (concat (first second-split) (second first-split))]))
 
-(def tweak-weights {:mutate 50
-                    :one-point-crossover 50})
+(s/defn two-point-crossover :- [Genome]
+  "Creates two new children from `a` and `b` by chosing two points and
+  swapping all elements between those points."
+  [a :- Genome
+   b :- Genome]
+  ; both are split into three chunks [l c r] and then those are exchanged
+  (let [both [a b]
+        [l-len lc-len] (sort (repeatedly 2 (partial length-within both)))
+        c-len (- lc-len l-len)
+        [[a-l a-c a-r] [b-l b-c b-r]]
+        (map
+         #(let [[l cr] (split-at l-len %)
+                [c r] (split-at c-len cr)]
+           [l c r])
+         both)]
+    [(concat a-l b-c a-r)
+     (concat b-l a-c b-r)]))
+
+
+(def tweak-weights {:mutate 1
+                    :two-point-crossover 5})
 
 (def tweaks-graph
  (g/graph
-   :mutate-p (fnk [] 0.02)
+   :mutate-p (fnk [] 0.01)
    :tweaks
     {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
               :n-parents (fnk [] 1)
               :multiple-children? (fnk [] false)}
      :one-point-crossover {:f (fnk [] one-point-crossover)
                            :n-parents (fnk [] 2)
+                           :multiple-children? (fnk [] true)}
+     :two-point-crossover {:f (fnk [] two-point-crossover)
+                           :n-parents (fnk [] 2)
                            :multiple-children? (fnk [] true)}}))
-
 (def graph
  (g/graph
-   :->genome (g/instance ->genome [n-genes] {:n n-genes})
+   :->genome ->genome
    tweaks-graph
    :tweak-weights (fnk _ :- {s/Keyword s/Int} [] tweak-weights)
    :->tweak step/weighted-tweaks))
