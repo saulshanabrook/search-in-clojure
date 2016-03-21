@@ -35,7 +35,6 @@
             "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]
-            ;  :config-files ["eastwood.clj"]
              :exclude-linters [:unused-locals ; warns with defnk-fn macro
                                :keyword-typos ; warns on graph definitions in core
                                :unused-ret-vals ; warns when `(apply <non-pure-function> args)`
