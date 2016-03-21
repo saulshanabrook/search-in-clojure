@@ -69,6 +69,7 @@
    :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
    :values-graph (fnk [values :- {s/Keyword s/Any}]
                   (->> values
+                    utils/eval-load-ns
                     (plumbing.core/map-vals utils/v->fnk)
                     g/graph))
    :wrappers (fnk [wrapper-forms :- [Wrapper]] (map utils/eval-load-ns wrapper-forms))
