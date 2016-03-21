@@ -4,7 +4,7 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.utils :refer [defnk-fn] :as utils]
+            [search.utils :refer [defnk-fn v->fnk] :as utils]
             [search.graphs.base.step :as step]))
 
 
@@ -34,7 +34,7 @@
   (let [max-length (apply min (map count seqs))]
     (if (= 1 max-length)
       1
-      (clojure.data.generators/uniform 1 max-length))))
+      (clojure.data.generators/uniform 0 (inc max-length)))))
 
 (s/defn one-point-crossover :- [Genome]
   "Creates two new children from `first_` and `second_` by chosing a point and
@@ -65,45 +65,49 @@
      (concat b-l a-c b-r)]))
 
 
-(def tweak-weights {:mutate 1
-                    :two-point-crossover 5})
+(defnk-fn alternation :- Genome
+ "Merges two sequences, taking sequential items from one then crossing over and
+  taking items from the other. After each item there is a `p`
+  chance of switching to the other sequence."
+ [p :- utils/Probability]
+ [a :- Genome
+  b :- Genome]
+ (let [switch? (partial utils/rand-true? p)]
+   (loop [index 0
+          currents (cycle [a b])
+          merged []]
+     (let [current (first currents)]
+       (if (>= index (count current))
+         merged
+         (recur
+           (inc index)
+           (if (switch?) (rest currents) currents)
+           (conj merged (nth current index))))))))
 
-(def tweaks-graph
- (g/graph
-   :mutate-p (fnk [] 0.01)
-   :tweaks
-    {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
-              :n-parents (fnk [] 1)
-              :multiple-children? (fnk [] false)}
-     :one-point-crossover {:f (fnk [] one-point-crossover)
-                           :n-parents (fnk [] 2)
-                           :multiple-children? (fnk [] true)}
-     :two-point-crossover {:f (fnk [] two-point-crossover)
-                           :n-parents (fnk [] 2)
-                           :multiple-children? (fnk [] true)}}))
+
+
 (def graph
  (g/graph
    :->genome ->genome
-   tweaks-graph
-   :tweak-weights (fnk _ :- {s/Keyword s/Int} [] tweak-weights)
+   :mutate-p (v->fnk 0.1)
+   :alternation-p (v->fnk 0.05)
+   :tweaks
+    {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
+              :n-parents (v->fnk 1)
+              :multiple-children? (v->fnk false)}
+     :one-point-crossover (v->fnk
+                           {:f one-point-crossover
+                            :n-parents 2
+                            :multiple-children? true})
+     :two-point-crossover (v->fnk
+                           {:f two-point-crossover
+                            :n-parents 2
+                            :multiple-children? true})
+     :alternation {:f (g/instance alternation [alternation-p] {:p alternation-p})
+                   :n-parents (v->fnk 2)
+                   :multiple-children? (v->fnk false)}}
+   :tweak-weights (v->fnk {:mutate 1
+                           :one-point-crossover 0
+                           :two-point-crossover 0
+                           :alternation 4})
    :->tweak step/weighted-tweaks))
-
-; (s/defn alternation
-;   "Merges two sequences, taking sequential items from one then crossing over and
-;   taking items from the other. After each item there is  a `prob`
-;   chance of switching to the other sequence.
-;
-;   It will stop when it tries to select an index passed the end of either sequence."
-;   [prob :- utils/Probability
-;    [first_ second_] :- [(s/one s/Genome "first") (s/one s/Genome "second")]]
-;   (let [switch? (partial weighted-bool prob)]
-;     (loop [index 0
-;            first_? True
-;            merged (list)]
-;       (let [current (if first_? first_ second_)]
-;         (if (>= index (count current))
-;           merged
-;           (recur
-;             (inc index)
-;             (if (switch?) (not first_) second_)
-;             (conj merged (nth current index))))))))

@@ -6,7 +6,7 @@
             [push.interpreter.templates.one-with-everything :refer [make-everything-interpreter]]
             [clojure.data.generators]
 
-            [search.utils :refer [defnk-fn]]
+            [search.utils :refer [defnk-fn] :as utils]
             [search.graphs.seq :as seq]))
 
 (defnk-fn ->instruction :- s/Any
@@ -33,8 +33,9 @@
 
 (def graph
   (g/graph
-    :step-limit (fnk [] 500)
-    :interpreter (fnk [] (make-everything-interpreter))
+    :step-limit (utils/v->fnk 500)
+    :interpreter (fnk [push-bindings]
+                  (make-everything-interpreter :bindings (zipmap push-bindings (repeat nil))))
     :push-evaluate evaluate
     :->gene ->instruction
     seq/graph))

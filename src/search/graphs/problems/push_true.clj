@@ -18,7 +18,7 @@
 (def graph
   (g/graph
 
-    (g/instance push/graph {:output-stack :boolean :n-genes 50})
+    (g/instance push/graph {:output-stack :boolean :n-genes 50 :push-bindings []})
     :genome->traits genome->traits
     :trait-specs (utils/v->fnk {:value {:lowest? false}})
     :select (g/instance select/roulette {:trait-key :value})

@@ -9,7 +9,7 @@
 (def Genome s/Any)
 
 (def TraitKey s/Any)
-(def TraitValue (s/maybe s/Int))
+(def TraitValue (s/maybe s/Num))
 
 (def Traits
   "Traits are any information we want to know about an indivual. For single
