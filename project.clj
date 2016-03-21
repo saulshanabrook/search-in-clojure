@@ -17,7 +17,8 @@
                  [klapaucius "0.1.10-SNAPSHOT"]
                  [clj-fuzzy "0.3.1"]
                  [org.clojure/tools.cli "0.3.3"]
-                 [mvxcvi/puget "1.0.0"]]
+                 [mvxcvi/puget "1.0.0"]
+                 [org.clojure/math.numeric-tower "0.0.4"]]
   :profiles {:perf {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=true"
                                "-Dclojure.compiler.direct-linking=true"]
                     :aot [search.cli]}
