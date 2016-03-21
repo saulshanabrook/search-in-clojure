@@ -1,4 +1,7 @@
 (ns search.wrappers.recorders
+  "Recorders are used to somehow show the information about the run.
+
+   This could be logging to stdout or sending information to a database."
   (:require [schema.core :as s]
             [plumbing.fnk.pfnk :as pfnk]
             [taoensso.timbre :as timbre]
@@ -28,7 +31,7 @@
 
 
 (s/defn wrap :- search/SearchGraph
-  "Modify graph g so that it records the run as it progresses."
+  "Modify graph g so that it records the run as it progresses"
   [{:keys [started! generation! done!]} :- Recorder
    {->gens :generations :as g} :- search/SearchGraph]
   (assoc g :generations

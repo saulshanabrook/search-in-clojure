@@ -19,7 +19,7 @@ knowledge of how everything connected.
 In contrast, this framework has a small core ([`search.core`](./src/search/core.clj))
 and implements all the interesting parts of search as pluggable modules.
 
-## How?
+## Running searches
 ![ns graph](/docs/ns-hierarchy.png?raw=true)
 
 
@@ -77,3 +77,16 @@ lein trampoline run -g '[search.graphs.problems.push-sr/plus-six-graph search.gr
 
 The `perf` profile in lein enables some optimizations and can be enabled
 with `lein with-profile +perf trampoline run ...`
+
+## Contributing
+The code is split into two main subdirectory, `graphs` and `wrappers`.
+Primarily, the difference is that the `graphs` provides a bunch of, well, graphs
+that get merged together. At the top level, these are the `algorithms` and
+`problems`. Each of those in tern combines a bunch of graphs and together make
+up a full search. This is just how it has worked out so far, however. It is
+totally possible to design a whole search without using any of the existing
+graphs, you would just end up repeating a lot of things.
+
+The `wrappers` are all function that take a graph as input and return a new
+graph. They do fancy things like add a stateful function call as the generations
+are evaluated and add profiling.

@@ -1,4 +1,5 @@
 (ns search.graphs.seq
+  "Provides building blocks for genomes that are sequences."
   (:require [schema.core :as s]
             [clojure.data.generators]
             [plumbing.graph :as g]
@@ -87,6 +88,8 @@
 
 
 (def graph
+ "Provides the `->tweak` and `->genome` keys, by using `->gene` and `n-genes`,
+  which controls how long the initial genome should be."
  (g/graph
    :->genome ->genome
    :mutate-p (v->fnk 0.01)

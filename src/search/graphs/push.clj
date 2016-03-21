@@ -1,4 +1,5 @@
 (ns search.graphs.push
+  "Adds the ability to use the push interpreter to evaluate your programs."
   (:require [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
             [push.core :as push]
@@ -32,6 +33,8 @@
 
 
 (def graph
+  "Provides the `:->gene` for `search.graphs.seq/graph` by selecting a random
+   push instruction. It also provides `:push-evaluate`."
   (g/graph
     :step-limit (utils/v->fnk 500)
     :interpreter (fnk [push-bindings]
