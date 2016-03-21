@@ -10,11 +10,11 @@
 (deftest test-main
   (testing "list genetic"
     (testing "graphs"
-      (cli/-main "-g" "[search.examples.list/graph search.algorithms.genetic/graph]"))
+      (cli/-main "-g" "[search.graphs.problems.list/graph search.graphs.algorithms.genetic/graph]"))
     (testing "recorders"
       (with-redefs [println identity]
-        (cli/-main "-g" "[search.examples.list/graph search.algorithms.genetic/graph]"
-                   "-w" "[(partial search.recorders.core/wrap search.recorders.text/best-traits)]")))
+        (cli/-main "-g" "[search.graphs.problems.list/graph search.graphs.algorithms.genetic/graph]"
+                   "-w" "[(partial search.wrappers.recorders/wrap search.wrappers.recorders/best-traits)]")))
     (testing "values"
-      (cli/-main "-g" "[search.examples.list/graph search.algorithms.genetic/graph]"
+      (cli/-main "-g" "[search.graphs.problems.list/graph search.graphs.algorithms.genetic/graph]"
                  "-v" "{:max-generations 1}"))))
