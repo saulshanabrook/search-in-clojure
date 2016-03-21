@@ -72,12 +72,13 @@
    trait, when we order the traits randomly."
   [trait-specs :- TraitSpecs]
   [inds :- #{search/Individual}]
-  (map
-   (fn [[trait-key trait-spec]]
-     (best-trait {:inds inds
-                  :trait-key trait-key
-                  :trait-spec trait-spec}))
-   (-> trait-specs seq clojure.data.generators/shuffle cycle)))
+  (cycle
+    (map
+     (fn [[trait-key trait-spec]]
+       (best-trait {:inds inds
+                    :trait-key trait-key
+                    :trait-spec trait-spec}))
+     (-> trait-specs seq clojure.data.generators/shuffle))))
 
 (s/defn sum-of-squares :- (s/maybe s/Num)
   "Returns the sum of the squared values or `nil` if any are `nil`."

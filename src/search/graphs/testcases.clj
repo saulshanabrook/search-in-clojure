@@ -33,9 +33,11 @@
    test-fn :- TestFn]
   [genome :- search/Genome]
   (into {}
-    (for [[t-in t-out] test-cases]
-      [t-in
-       (test-output->trait-value t-out (test-fn genome t-in))])))
+    (map
+      (fn [[t-in t-out]]
+        [t-in
+         (test-output->trait-value t-out (test-fn genome t-in))])
+      test-cases)))
 
 (s/defn difference-squared :- (s/maybe s/Num)
   [a :- (s/maybe s/Num)

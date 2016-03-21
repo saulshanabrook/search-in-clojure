@@ -3,8 +3,6 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [push.interpreter.templates.one-with-everything :refer [make-everything-interpreter]]
-
             [search.core :as search]
             [search.graphs.push :as push]
             [search.graphs.testcases :as testcases]
@@ -33,8 +31,8 @@
   (g/graph
     :ys (fnk [->y xs] (map ->y xs))
     :test-cases (fnk test-cases :- {s/Num s/Num} [xs ys] (zipmap xs ys))
-    (g/instance push/graph {:push-bindings [:x]
-                            :n-genes 20})
+    :n-genes (utils/v->fnk 20)
+    (g/instance push/graph {:push-bindings [:x]})
     :test-fn (fnk [push-evaluate] (fn [genome x] (push-evaluate genome {:x x})))
     testcases/graph
 

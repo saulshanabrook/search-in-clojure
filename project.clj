@@ -3,7 +3,7 @@
   :url "http://github.com/saulshanabrook/search-in-clojure"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
-  :main search.cli
+  :main ^:skip-aot search.cli
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.generators "0.1.2"]
                  [prismatic/schema "1.0.4"]
@@ -18,7 +18,10 @@
                  [clj-fuzzy "0.3.1"]
                  [org.clojure/tools.cli "0.3.3"]
                  [mvxcvi/puget "1.0.0"]]
-  :profiles {:dev {:dependencies [[slamhound "1.5.5"]]
+  :profiles {:perf {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=true"
+                               "-Dclojure.compiler.direct-linking=true"]
+                    :aot [search.cli]}
+             :dev {:dependencies [[slamhound "1.5.5"]]
                    :plugins [[lein-kibit "0.1.2"]
                              [jonase/eastwood "0.2.3"]
                              [lein-ancient "0.6.8"]

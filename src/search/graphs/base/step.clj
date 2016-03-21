@@ -39,7 +39,7 @@
    ->tweak :- (s/=> Tweak)]
   [{individuals :individuals} :- search/Generation]
   (let [f (fn select-and-tweak-inner [parents]
-            (let [{:keys [f n-parents multiple-children?]}  (->tweak)
+            (let [{:keys [f n-parents multiple-children?]} (->tweak)
                   [first_parents rest_parents] (split-at n-parents parents)
                   child-genome_s (apply f (map :genome first_parents))
                   child-genomes (if multiple-children? child-genome_s [child-genome_s])

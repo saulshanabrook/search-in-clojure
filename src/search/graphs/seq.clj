@@ -89,7 +89,7 @@
 (def graph
  (g/graph
    :->genome ->genome
-   :mutate-p (v->fnk 0.1)
+   :mutate-p (v->fnk 0.01)
    :alternation-p (v->fnk 0.05)
    :tweaks
     {:mutate {:f (g/instance mutate [mutate-p] {:p mutate-p})
@@ -106,8 +106,8 @@
      :alternation {:f (g/instance alternation [alternation-p] {:p alternation-p})
                    :n-parents (v->fnk 2)
                    :multiple-children? (v->fnk false)}}
-   :tweak-weights (v->fnk {:mutate 1
+   :tweak-weights (v->fnk {:mutate 2
                            :one-point-crossover 0
-                           :two-point-crossover 0
-                           :alternation 4})
+                           :two-point-crossover 2
+                           :alternation 2})
    :->tweak step/weighted-tweaks))
