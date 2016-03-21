@@ -6,7 +6,7 @@
   [graphs]
   (clojure.test/is
     (-> {:graph-symbols graphs}
-      search/->search
-      search/search->generations
+      search/->config
+      search/config->generations
       doall
       seq)))

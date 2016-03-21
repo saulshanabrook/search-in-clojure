@@ -177,4 +177,4 @@
   (is (= 1 (utils/eval-load-ns 1)))
   (is (= 3 (utils/eval-load-ns `some-var)))
   (is (thrown? Exception (utils/eval-load-ns 'some-madeup-ns/dfd)))
-  (is (utils/eval-load-ns 'search.core-test/search->generations-test)))
+  (is (utils/eval-load-ns 'search.core-test/config->generations-test)))

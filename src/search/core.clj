@@ -29,7 +29,7 @@
 
 (def Wrapper s/Any)
 
-(def Search
+(def Config
   "A search configuration is represented as a map. It contains all the data
    neccesary to run the search in a serializiable form, so that it can be
    preserved in a text form.
@@ -50,10 +50,9 @@
    :values {s/Keyword s/Any}
    :wrapper-forms [Wrapper]})
 
-(def SearchID s/Str)
 (def SearchGraph (s/constrained utils/Graph #(contains? % :generations)))
 
-(defnk ->search :- Search
+(defnk ->config :- Config
   [graph-symbols
    {values {}}
    {wrapper-forms []}]
@@ -65,7 +64,7 @@
   (g/graph
    :default-graph (fnk [graph-symbols values wrapper-forms :as s]
                    {:id (fnk [] (utils/id))
-                    :search (utils/v->fnk s)})
+                    :config (utils/v->fnk s)})
    :graphs (fnk [graph-symbols :- [s/Symbol]] (map utils/symbol->value graph-symbols))
    :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
    :values-graph (fnk [values :- {s/Keyword s/Any}]
@@ -86,11 +85,11 @@
 
 (def compute-search (g/compile compute-search-graph))
 
-(s/defn search->generations ; infinite sequence of generations
-  "Computes the generations for the search. Returns a (possibly infinite)
+(s/defn config->generations ; infinite sequence of generations
+  "Computes the generations for this config. Returns a (possibly infinite)
   lazy sequence of generations. The computation happens when you resolve them."
-  [search :- Search]
-  (-> search
+  [config :- Config]
+  (-> config
     compute-search
     :computed
     :generations))

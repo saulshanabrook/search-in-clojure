@@ -51,6 +51,6 @@
       errors (exit 1 (error-msg errors)))
     (when (:validate-schema options) (s/set-fn-validation! true))
     (-> options
-      (select-keys (keys search/Search))
-      search/search->generations
+      (select-keys (keys search/Config))
+      search/config->generations
       dorun)))

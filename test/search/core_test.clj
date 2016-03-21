@@ -29,10 +29,10 @@
   (assoc g :something (utils/v->fnk generation)))
 
 (defn is-first-generation
-  [generation search-args]
-  (is (= generation (-> search-args search/->search search/search->generations first))))
+  [generation config-args]
+  (is (= generation (-> config-args search/->config search/config->generations first))))
 
-(deftest search->generations-test
+(deftest config->generations-test
   (testing "one graph"
     (is-first-generation
       generation
