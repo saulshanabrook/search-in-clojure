@@ -78,6 +78,11 @@ lein trampoline run -g '[search.graphs.problems.push-sr/plus-six-graph search.gr
 The `perf` profile in lein enables some optimizations and can be enabled
 with `lein with-profile +perf trampoline run ...`
 
+Also, if you are getting an error in the run, you can add the `-s` flag to
+enable schema validation, which should help you verify and diagnose the
+execution. It does have some (untested) performance penalty so it is disabled
+by default.
+
 ## Contributing
 The code is split into two main subdirectory, `graphs` and `wrappers`.
 Primarily, the difference is that the `graphs` provides a bunch of, well, graphs
