@@ -4,6 +4,7 @@
             [schema.test]
             [plumbing.core :refer [fnk]]
             [schema.experimental.generators :as g]
+            [clojure.test.check.generators :as generators]
             [plumbing.graph]
 
             [search.wrappers.recorders :as recorders]
@@ -19,7 +20,7 @@
 (deftest wrap-test
   (conjure/instrumenting [started! generation! done!]
     (let [gens (repeatedly 10 #(g/generate search/Generation))
-          metadata (g/generate recorders/Metadata)
+          metadata (g/generate recorders/Metadata {utils/Probability (generators/choose 0 1)})
           g (assoc (plumbing.core/map-vals utils/v->fnk metadata)
               :generations (fnk [] gens))
           recorder {:started! started!
