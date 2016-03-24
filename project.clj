@@ -32,7 +32,11 @@
                              [lein-gorilla "0.3.6"]]}}
 
 
-  :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
+  :aliases {"test-all" ["do"
+                        ["check"]
+                        ; ["kibit"]
+                        ["eastwood"]
+                        ["test"]]
             "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]
