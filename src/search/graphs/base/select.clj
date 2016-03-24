@@ -56,6 +56,16 @@
      #(get-in % [:traits trait-key]))
    inds))
 
+(defnk all-best-trait :- #{search/Individual}
+  "Returns the best individuals according to the `trait-key` trait"
+  [inds :- #{search/Individual}
+   trait-key :- search/TraitKey
+   trait-spec :- TraitSpec]
+  (utils/all-nil-comp-key
+    #(get-in % [:traits trait-key])
+    (if (:lowest? trait-spec) < >)
+    inds))
+
 (defnk-fn dominates :- s/Any ; :- s(utils/InfSeq search/Individual)
   "Selects the parent with the highest (or lowest if `lowest?`) `trait-name`.
 
@@ -68,17 +78,19 @@
                        :trait-spec (trait-specs trait-key)})))
 
 (defnk-fn lexicase :- s/Any ; :- s(utils/InfSeq search/Individual)
-  "Chooses the individuals by selecting the one that does the best on each
-   trait, when we order the traits randomly."
+  "Lexicase selection as defined in
+   https://push-language.hampshire.edu/t/lexicase-selection/90."
   [trait-specs :- TraitSpecs]
   [inds :- #{search/Individual}]
-  (cycle
-    (map
-     (fn [[trait-key trait-spec]]
-       (best-trait {:inds inds
-                    :trait-key trait-key
-                    :trait-spec trait-spec}))
-     (-> trait-specs seq clojure.data.generators/shuffle))))
+  (repeatedly
+    #(loop [candidates inds
+            cases (-> trait-specs seq clojure.data.generators/shuffle)]
+      (if (or (= 1 (count candidates)) (empty? cases))
+        (clojure.data.generators/rand-nth (seq candidates))
+        (let [[[trait-key trait-spec] & r_cases] cases]
+           (recur
+             (all-best-trait {:inds candidates :trait-key trait-key :trait-spec trait-spec})
+             r_cases))))))
 
 (s/defn sum-of-squares :- (s/maybe s/Num)
   "Returns the sum of the squared values or `nil` if any are `nil`."

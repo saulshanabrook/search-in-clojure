@@ -241,3 +241,28 @@
     (s/=>
       (v->schema v)
       {s/Keyword s/Any})))
+
+(s/defn all-nil-comp-key :- #{s/Any}
+  "Like min-key/max-key, but extends it further:
+
+   * Can use any comparator function (like <= or >=)
+   * Returns the set of all the first elements
+   * If (f x) returns nil, it automatically places this last in the ordering
+     (so your compartor doesn't have to handle nil values).
+  "
+  [f c xs]
+  (->
+   (reduce
+    (fn [[best_v best_xs] x]
+      (let [v (f x)]
+        (cond
+          ; Set to best if this is the first value
+          (= :init-best-v best_v) [v #{x}]
+          (= best_v v) [v (conj best_xs x)]
+          (nil? best_v) [v #{x}]
+          (nil? v) [best_v best_xs]
+          (c v best_v) [v #{x}]
+          :else  [best_v best_xs])))
+    [:init-best-v #{}]
+    xs)
+   second))
