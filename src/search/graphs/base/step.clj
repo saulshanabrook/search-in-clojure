@@ -1,6 +1,7 @@
 (ns search.graphs.base.step
   (:require [schema.core :as s]
-            [plumbing.core :refer [defnk]]
+            [plumbing.core :refer [defnk map-keys fnk]]
+            [plumbing.graph :as g]
 
             [search.utils :refer [defnk-fn] :as utils]
             [search.core :as search]))
@@ -9,56 +10,92 @@
   "Step to the next generation by taking the first `n` individuals from calling
   `breed` on the current generation."
   [n :- s/Int
-   breed :- (s/=> [search/Individual] search/Generation)]
+   breed :- (s/=> (utils/InfSeq search/Individual) search/Generation)]
   [generation :- search/Generation]
   {:index       (inc (:index generation))
    :individuals (utils/take-set n (breed generation))})
 
-(def Tweak {:f (s/=> (s/cond-pre [search/Genome] search/Genome) & [search/Genome])
-            :n-parents s/Int
-            :multiple-children? s/Bool})
+(def Select (s/=> search/Individual #{search/Individual}))
+(def Tweak
+  "Take in some number of parent genomes and return a set of child genomes.
 
-(s/defn ->child-individual :- search/Individual
-  [parents :- [search/Individual]
-   child-genome :- search/Genome]
-  {:id (utils/id)
-   :genome child-genome
-   :parents-ids (set (map :id parents))
-   :traits {}})
+   mutate and crossover are two common examples"
+  {:f (s/=> (s/cond-pre [search/Genome] search/Genome) & [search/Genome])
+   :n-parents s/Int
+   :multiple-children? s/Bool})
 
-(defnk-fn select-and-tweak :- (utils/InfSeq search/Individual)
+(def TweakLabel s/Keyword)
+
+(defn ->seq-if
+  "If `?` wrap val in a sequence, else return it directly"
+  [? val]
+  (if ? [val] val))
+
+(defnk-fn weighted-tweaks->children :- s/Any ;- (utils/InfSeq search/Individual)
   "Returns an infinite lazy sequence of possible offspring.
 
-  First it calls `select` with the current individuals in the population, to
-  get an infinite lazy sequence of parents.
+  Chooses children from each pipeline of tweaks using the `tweak-label-weights`.
+  Each key in `tweak-label-weights` can be either a single tweak label
+  or a sequence of labels."
+  [tweak-labels :- {TweakLabel Tweak}
+   tweak-label-weights :- {(s/cond-pre TweakLabel [TweakLabel]) s/Int}
+   tweaks->children :- (s/=> (utils/InfSeq search/Individual) [Tweak] search/Generation)]
+  [generation :- search/Generation]
+  (->> tweak-label-weights
+     (map-keys #(->> %1
+                  (->seq-if (keyword? %1))
+                  (map tweak-labels)
+                  (tweaks->children generation)))
+     utils/interleave-weighted))
 
-  Then it repeatedly calls the `->tweak` function to get a `Tweak` function. It calls
-  each `f` with the required number of parents, and lazily returns the
-  children generated. Then it recurses with the rest of the parents."
-  [select :- (s/=> (utils/InfSeq search/Individual) #{search/Individual})
-   ->tweak :- (s/=> Tweak)]
-  [{individuals :individuals} :- search/Generation]
-  (let [f (fn select-and-tweak-inner [parents]
-            (let [{:keys [f n-parents multiple-children?]} (->tweak)
-                  [first_parents rest_parents] (split-at n-parents parents)
-                  child-genome_s (apply f (map :genome first_parents))
-                  child-genomes (if multiple-children? child-genome_s [child-genome_s])
-                  child-inds (map (partial ->child-individual first_parents) child-genomes)]
-              (concat
-               child-inds
-               (lazy-seq (select-and-tweak-inner rest_parents)))))]
-    (f (select individuals))))
+(defnk ->child-individual :- search/Individual
+  [parent-ids :- #{s/Str}
+   genome :- search/Genome]
+  {:id (utils/id)
+   :genome genome
+   :parent-ids parent-ids
+   :traits {}})
+
+(s/defn tweak-intermediate
+  "Takes in a tweak and some intermediate individuals and calls the tweak on
+    them "
+  [children :- s/Any ; [{:genome s/Any :parent-ids #{s/Str}}]
+   {:keys [f n-parents multiple-children?]} :- Tweak]
+  (->> children
+    ; split the intermediate children up into groups, so that the current
+    ; tweak can be applied to each group
+    (partition n-parents)
+    (mapcat
+      ; apply the tweak to this group of parents
+      (s/fn tweak-intermediate-inner :- [{:genome s/Any :parent-ids #{s/Str}}]
+        [parents :- [{:genome s/Any :parent-ids #{s/Str}}]]
+        (let [parent-ids (apply clojure.set/union (map :parent-ids parents))]
+          (->> parents
+            (map :genome)
+            (apply f)
+            (->seq-if (not multiple-children?))
+            (map #(hash-map :genome %
+                            :parent-ids parent-ids))))))))
 
 
-(defnk-fn weighted-tweaks :- Tweak
-  "Returns a random `tweak` from `tweaks`, by selecting based on the weights
-   defined in `tweak-weights`"
-  [tweaks :- {s/Keyword Tweak}
-   tweak-weights :- {s/Keyword s/Int}]
-  []
-  (do
-    (assert (apply clojure.set/subset? (map (comp set keys) [tweak-weights tweaks])))
-    (->
-      tweak-weights
-      clojure.data.generators/weighted
-      tweaks)))
+(defnk-fn tweaks->children :- s/Any ;- (utils/InfSeq search/Individual)
+  "Takes a pipeline of tweaks and a way to get a parent, and returns a sequence
+  of children with that tweaks applied to the parents in that order"
+  [select :- Select]
+  [{individuals :individuals} :- search/Generation
+   tweaks :- [Tweak]]
+  (let [->parent (partial select individuals)]
+    (->> tweaks
+      (reduce
+        tweak-intermediate
+        (map
+          (fn [{:keys [genome id]}]
+            {:genome genome :parent-ids #{id}})
+          (repeatedly ->parent)))
+      (map ->child-individual))))
+
+(def graph
+  (g/graph
+    :tweaks->children tweaks->children
+    :breed weighted-tweaks->children
+    :step (g/instance breed-> [population-size] {:n population-size})))

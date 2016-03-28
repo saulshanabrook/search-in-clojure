@@ -17,7 +17,7 @@
                           (fn []
                             {:genome :test
                              :id (utils/id)
-                             :parents-ids #{}
+                             :parent-ids #{}
                              :traits {}}))}
            (initial/->genome-> {:->genome (fn [] :test)
                                 :n n}))))))

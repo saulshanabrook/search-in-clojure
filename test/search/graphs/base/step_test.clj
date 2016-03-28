@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [schema.test]
             [schema.experimental.generators :as g]
+            [conjure.core :refer :all]
 
             [search.core :as search]
             [search.graphs.base.step :as step]
@@ -31,39 +32,50 @@
               :individuals new-inds}
              (select-keys next-gen [:individuals :index]))))))
 
-(deftest select-and-tweak-test
-  (let [->individual #(->
-                       search/Individual
-                       g/generate
-                       (assoc :genome %))
-        inds [(->individual 1) (->individual 2)]
-        inds-ids (map :id inds)
-        generation (->
-                    search/Generation
-                    g/generate
-                    (assoc :individuals (into #{} inds)))
+(defn t->c-dummy [_ _] nil)
+(deftest weighted-tweaks->children-test
+  (let [->tweak (fn [] {:f (fn [_] nil) :n-parents 1 :multiple-children? true})
+        tweak-1 (->tweak)
+        tweak-2 (->tweak)
+        ind (g/generate search/Individual)
+        gen (g/generate search/Generation)]
+    (stubbing [t->c-dummy (repeat ind)]
+      (let [breed (step/weighted-tweaks->children
+                     {:tweak-labels {:1 tweak-1 :2 tweak-2}
+                      :tweak-label-weights {:1 0
+                                            [:1 :2] 1}
+                      :tweaks->children t->c-dummy})]
+        (is (= [ind ind] (take 2 (breed gen))))
+        (verify-nth-call-args-for 1 t->c-dummy gen [tweak-1])
+        (verify-nth-call-args-for 2 t->c-dummy gen [tweak-1 tweak-2])
+        (verify-call-times-for t->c-dummy 2)))))
 
+(deftest tweaks->children-test
+  (let [->ind #(-> search/Individual
+                g/generate
+                (assoc :genome %))
+        ind-1 (->ind 1)
+        ind-2 (->ind 2)
+        select-fn (utils/seq->fn (cycle [ind-1 ind-2]))
+        t->c (step/tweaks->children {:select (fn [_] (select-fn))})
+        gen (-> search/Generation
+             g/generate
+             (assoc :individuals #{ind-1 ind-2}))
         tweak-add-and-mult {:f (fn [a b] [(+ a b) (* a b)])
-                             :multiple-children? true
-                             :n-parents 2}
+                            :multiple-children? true
+                            :n-parents 2}
         tweak-inc {:f inc
                    :multiple-children? false
                    :n-parents 1}
-        ; Should first use the `tweak-inc` and then `tweak-add-and-mult` and repeat
-        s-and-t (step/select-and-tweak
-                 {:select (comp cycle (partial sort-by :genome))
-                  :->tweak (utils/seq->fn (cycle [tweak-inc tweak-add-and-mult]))})
-        children (s-and-t generation)]
-    (is (= [{:genome 2 :parents-ids #{(first inds-ids)}}; first should inc the first ind
-            {:genome 3 :parents-ids (set inds-ids)} {:genome 2 :parents-ids (set inds-ids)} ; then add and multiply the last and the first
-            {:genome 3 :parents-ids #{(second inds-ids)}}] ; then should increment the last
-           (take 4 (map #(select-keys % [:genome :parents-ids]) children))))))
-
-(deftest weighted-tweaks-test
-  (let [first_tweak {:f identity :n-parents 23143 :multiple-children? true}
-        second_tweak {:f identity :n-parents 234 :multiple-children? false}
-        ->tweak #(step/weighted-tweaks
-                  {:tweaks {:first first_tweak :second second_tweak}
-                   :tweak-weights %})]
-    (is (= first_tweak ((->tweak {:first 1 :second 0}))))
-    (is (= second_tweak ((->tweak {:first 0 :second 1}))))))
+        children (t->c gen [tweak-inc tweak-add-and-mult])
+        children-some (map #(select-keys % [:genome :parent-ids]) children)
+        parent-ids #{(:id ind-1) (:id ind-2)}]
+    ; increment 1 and 2 to get 2 and 3, then add them
+    (is (=
+          {:genome 5
+           :parent-ids parent-ids}
+          (first children-some)))
+    (is (=
+          {:genome 6
+           :parent-ids parent-ids}
+          (second children-some)))))

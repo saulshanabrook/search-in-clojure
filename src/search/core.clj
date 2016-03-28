@@ -24,7 +24,7 @@
   {:genome Genome
    :id s/Str
    :traits Traits
-   :parents-ids #{s/Str}})
+   :parent-ids #{s/Str}})
 
 (def Generation
   "Holds the whole state for a current generation of individuals."

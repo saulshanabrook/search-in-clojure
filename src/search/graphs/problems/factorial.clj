@@ -34,7 +34,7 @@
     :step-limit (v->fnk 1000)
     :alternation-p (v->fnk 0.05)
     :mutate-p (v->fnk 0.05)
-    :tweak-weights (v->fnk {:mutate 1 :alternation 1})
+    :tweak-label-weights (v->fnk {[:mutate :alternation] 1})
     :instructions
       (v->fnk
        [0

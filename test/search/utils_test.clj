@@ -185,3 +185,9 @@
         (utils/all-nil-comp-key second < [["d" 2] ["a" 1] ["b" 2] ["c" 1] ["j" nil]])))
   (is (= #{} (utils/all-nil-comp-key identity < [])))
   (is (= #{["a" nil] ["b" nil]} (utils/all-nil-comp-key second < [["a" nil] ["b" nil]]))))
+
+(deftest interleave-weighted-test
+  (is (= [1 1 1] (take 3 (utils/interleave-weighted {(cycle [1]) 1
+                                                     (cycle [0]) 0}))))
+  (is (= [1 2 1] (take 3 (utils/interleave-weighted {(cycle [1 2]) 1
+                                                     (cycle [0]) 0})))))

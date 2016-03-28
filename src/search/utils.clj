@@ -121,7 +121,6 @@
   "Takes a sequence and returns a function that takes no argument and returns
   the first value first, then the second value, and so on.
 
-      (= [1 2 1] (repeatedely 3 (seq->fn (cycle [1 2]))))
       (= [1 2 1] (repeatedly 3 (seq->fn (cycle [1 2]))))
   "
   [s]
@@ -267,3 +266,25 @@
     [:init-best-v #{}]
     xs)
    second))
+
+
+(s/defn take-one-item :- [(s/one s/Any "item") (s/one {s/Any s/Int} "weights")]
+  [seq-weights :- {s/Any s/Int}]
+  (let [anot-seq-weights (for [[i [xs v]] (zipmap (range) seq-weights)] [[i xs] v])
+        [i xs] (clojure.data.generators/weighted (into {} anot-seq-weights))
+        seq-weights-vec (vec (map (fn [[a b]] [(second a) b]) anot-seq-weights))
+        rest-seq-weights-vec (assoc-in seq-weights-vec [i 0] (rest xs))]
+    [(first xs) (into {} rest-seq-weights-vec)]))
+
+
+(s/defn interleave-weighted ; :- (InfSeq s/Any)
+ "Interleaves together a sequences by selecting each next element
+   based on the weight it is given.
+
+   For example calling it with `{(cycle [1 2]) 10 (cycle [:a :b]) 1}` Would produce a
+   lazy sequence that is mostly elements from `[1 2]`, but has some elements from
+   `[:a :b]`"
+
+  [seq-weights :- {s/Any s/Int}]
+  (let [[item rest-seq-weights] (take-one-item seq-weights)]
+    (lazy-seq (cons item (interleave-weighted rest-seq-weights)))))
