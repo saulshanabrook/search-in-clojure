@@ -1,6 +1,5 @@
 (ns search.graphs.base.select
   (:require [schema.core :as s]
-            [clojure.data.generators]
             [plumbing.core :refer [defnk]]
 
             [search.core :as search]
@@ -30,7 +29,7 @@
                   ((if (-> trait-key trait-specs :lowest?) invert-list identity))
                   (map vector inds)
                   (into {}))]
-    (clojure.data.generators/weighted weights)))
+    (utils/weighted weights)))
 
 (def max-num Float/MAX_VALUE)
 (def min-num Float/MIN_VALUE)

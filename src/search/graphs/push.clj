@@ -28,7 +28,7 @@
   (let [bindings (push/binding-names interpreter)]
     (-> {instructions 5
          bindings (if (empty? bindings) 0 1)}
-      clojure.data.generators/weighted
+      utils/weighted
       clojure.data.generators/rand-nth)))
 
 (defnk-fn evaluate :- s/Any

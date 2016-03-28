@@ -6,10 +6,16 @@
             [clojure.data.generators]
             [clojure.test]
             [plumbing.core]
+            [taoensso.timbre.profiling :as profiling]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn id [] (uuid/to-string (uuid/v4)))
 
+
+(s/defn weighted :- s/Any
+  "Wraps `clojure.data.generators/weighted` to add more safety checks"
+  [weights :- {s/Any s/Int}]
+  (profiling/p :weighted (clojure.data.generators/weighted weights)))
 
 (defn take-until
   "Returns a lazy sequence of successive items from coll until
@@ -271,7 +277,7 @@
 (s/defn take-one-item :- [(s/one s/Any "item") (s/one {s/Any s/Int} "weights")]
   [seq-weights :- {s/Any s/Int}]
   (let [anot-seq-weights (for [[i [xs v]] (zipmap (range) seq-weights)] [[i xs] v])
-        [i xs] (clojure.data.generators/weighted (into {} anot-seq-weights))
+        [i xs] (weighted (into {} anot-seq-weights))
         seq-weights-vec (vec (map (fn [[a b]] [(second a) b]) anot-seq-weights))
         rest-seq-weights-vec (assoc-in seq-weights-vec [i 0] (rest xs))]
     [(first xs) (into {} rest-seq-weights-vec)]))
