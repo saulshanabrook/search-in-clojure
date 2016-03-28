@@ -122,6 +122,7 @@
   the first value first, then the second value, and so on.
 
       (= [1 2 1] (repeatedely 3 (seq->fn (cycle [1 2]))))
+      (= [1 2 1] (repeatedly 3 (seq->fn (cycle [1 2]))))
   "
   [s]
   (let [a (atom (conj (seq s) nil))]
