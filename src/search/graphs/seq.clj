@@ -5,9 +5,7 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.utils :refer [defnk-fn v->fnk] :as utils]
-            [search.graphs.base.step :as step]))
-
+            [search.utils :refer [defnk-fn v->fnk] :as utils]))
 
 (def Gene s/Any)
 (def Genome [Gene])

@@ -78,7 +78,7 @@
                             :parent-ids parent-ids))))))))
 
 
-(defnk-fn tweaks->children :- s/Any ;- (utils/InfSeq search/Individual)
+(defnk-fn tweaks->children_ :- s/Any ;- (utils/InfSeq search/Individual)
   "Takes a pipeline of tweaks and a way to get a parent, and returns a sequence
   of children with that tweaks applied to the parents in that order"
   [select :- Select]
@@ -96,6 +96,6 @@
 
 (def graph
   (g/graph
-    :tweaks->children tweaks->children
+    :tweaks->children tweaks->children_
     :breed weighted-tweaks->children
     :step (g/instance breed-> [population-size] {:n population-size})))

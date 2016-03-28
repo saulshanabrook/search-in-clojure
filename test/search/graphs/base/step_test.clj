@@ -50,14 +50,14 @@
         (verify-nth-call-args-for 2 t->c-dummy gen [tweak-1 tweak-2])
         (verify-call-times-for t->c-dummy 2)))))
 
-(deftest tweaks->children-test
+(deftest tweaks->children_-test
   (let [->ind #(-> search/Individual
                 g/generate
                 (assoc :genome %))
         ind-1 (->ind 1)
         ind-2 (->ind 2)
         select-fn (utils/seq->fn (cycle [ind-1 ind-2]))
-        t->c (step/tweaks->children {:select (fn [_] (select-fn))})
+        t->c (step/tweaks->children_ {:select (fn [_] (select-fn))})
         gen (-> search/Generation
              g/generate
              (assoc :individuals #{ind-1 ind-2}))
