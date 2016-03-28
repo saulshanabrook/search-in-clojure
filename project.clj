@@ -30,8 +30,8 @@
                              [lein-codox "0.9.4"]
                              [lein-exec "0.3.6"]
                              [lein-gorilla "0.3.6"]]}}
-
-
+  :test-selectors {:default (complement :slow)
+                   :slow :slow}
   :aliases {"test-all" ["do"
                         ["check"]
                         ; ["kibit"]

@@ -12,7 +12,7 @@
 (def dep-graph {:n (fnk [] 10)})
 (def graph {:generations (fnk [n] (repeatedly n (partial g/generate search/Generation)))})
 
-(deftest test-main
+(deftest ^:slow test-main
   (testing "graphs"
     (cli/-main "-g" "[search.cli-test/dep-graph search.cli-test/graph]"))
   (testing "recorders"
