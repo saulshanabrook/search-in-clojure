@@ -5,8 +5,8 @@
             [search.graphs.problems.test-utils :refer [finishes]]))
 (use-fixtures :once schema.test/validate-schemas)
 
-(deftest double-test
+(deftest ^:slow double-test
   (finishes ['search.graphs.problems.push-sr/double-graph 'search.graphs.algorithms.genetic/graph]))
 
-; (deftest plus-six-test
-;   (finishes ['search.graphs.problems.push-sr/plus-six-graph 'search.graphs.algorithms.genetic/graph]))
+(deftest ^:slow plus-six-test
+  (finishes ['search.graphs.problems.push-sr/plus-six-graph 'search.graphs.algorithms.genetic/graph]))

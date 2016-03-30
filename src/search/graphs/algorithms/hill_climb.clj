@@ -22,7 +22,8 @@
   (let [old-genome (:genome parent)
         new-genome (mutate old-genome)
         new-ind (assoc
-                 (step/->child-individual [parent] new-genome)
+                 (step/->child-individual {:parent-ids #{(:id parent)}
+                                           :genome new-genome})
                  :traits
                  (genome->traits new-genome))]
     (take 1 (select #{parent new-ind}))))
@@ -33,6 +34,5 @@
   (g/graph
     :initial (g/instance initial/->genome-> {:n 1})
     :evaluate evaluate/genome->traits->
-    :breed breed
-    :step  (g/instance step/breed-> {:n 1})
+    (g/instance step/graph {:population-size 1})
     :generations (g/instance base/generations {:n 1})))

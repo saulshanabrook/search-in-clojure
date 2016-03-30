@@ -6,10 +6,16 @@
             [clojure.data.generators]
             [clojure.test]
             [plumbing.core]
+            [taoensso.timbre.profiling :as profiling]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn id [] (uuid/to-string (uuid/v4)))
 
+
+(s/defn weighted :- s/Any
+  "Wraps `clojure.data.generators/weighted` to add more safety checks"
+  [weights :- {s/Any s/Int}]
+  (profiling/p :weighted (clojure.data.generators/weighted weights)))
 
 (defn take-until
   "Returns a lazy sequence of successive items from coll until
@@ -121,7 +127,7 @@
   "Takes a sequence and returns a function that takes no argument and returns
   the first value first, then the second value, and so on.
 
-      (= [1 2 1] (repeatedely 3 (seq->fn (cycle [1 2]))))
+      (= [1 2 1] (repeatedly 3 (seq->fn (cycle [1 2]))))
   "
   [s]
   (let [a (atom (conj (seq s) nil))]
@@ -241,3 +247,50 @@
     (s/=>
       (v->schema v)
       {s/Keyword s/Any})))
+
+(s/defn all-nil-comp-key :- #{s/Any}
+  "Like min-key/max-key, but extends it further:
+
+   * Can use any comparator function (like <= or >=)
+   * Returns the set of all the first elements
+   * If (f x) returns nil, it automatically places this last in the ordering
+     (so your compartor doesn't have to handle nil values).
+  "
+  [f c xs]
+  (->
+   (reduce
+    (fn [[best_v best_xs] x]
+      (let [v (f x)]
+        (cond
+          ; Set to best if this is the first value
+          (= :init-best-v best_v) [v #{x}]
+          (= best_v v) [v (conj best_xs x)]
+          (nil? best_v) [v #{x}]
+          (nil? v) [best_v best_xs]
+          (c v best_v) [v #{x}]
+          :else  [best_v best_xs])))
+    [:init-best-v #{}]
+    xs)
+   second))
+
+
+(s/defn take-one-item :- [(s/one s/Any "item") (s/one {s/Any s/Int} "weights")]
+  [seq-weights :- {s/Any s/Int}]
+  (let [anot-seq-weights (for [[i [xs v]] (zipmap (range) seq-weights)] [[i xs] v])
+        [i xs] (weighted (into {} anot-seq-weights))
+        seq-weights-vec (vec (map (fn [[a b]] [(second a) b]) anot-seq-weights))
+        rest-seq-weights-vec (assoc-in seq-weights-vec [i 0] (rest xs))]
+    [(first xs) (into {} rest-seq-weights-vec)]))
+
+
+(s/defn interleave-weighted ; :- (InfSeq s/Any)
+ "Interleaves together a sequences by selecting each next element
+   based on the weight it is given.
+
+   For example calling it with `{(cycle [1 2]) 10 (cycle [:a :b]) 1}` Would produce a
+   lazy sequence that is mostly elements from `[1 2]`, but has some elements from
+   `[:a :b]`"
+
+  [seq-weights :- {s/Any s/Int}]
+  (let [[item rest-seq-weights] (take-one-item seq-weights)]
+    (lazy-seq (cons item (interleave-weighted rest-seq-weights)))))

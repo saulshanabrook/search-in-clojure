@@ -18,7 +18,7 @@
    (s/optional-key :trait-specs) select/TraitSpecs
    (s/optional-key :population-size) s/Int
    (s/optional-key :n-genes) s/Int
-   (s/optional-key :tweak-weights) {s/Keyword s/Int}
+   (s/optional-key :tweak-label-weights) {s/Keyword s/Int}
    (s/optional-key :mutate-p) utils/Probability
    (s/optional-key :alternation-p) utils/Probability})
 

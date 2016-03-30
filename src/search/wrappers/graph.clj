@@ -18,7 +18,9 @@
   "Modify graph spec g, producing a new graph spec.
 
   If any node produces a function, it wraps that function to log when
-  it is called."
+  it is called.
+
+  This is useful when debugging where your application is spending time."
   [g :- utils/Graph]
   (let [indent (atom 0)]
     (utils/map-leaf-fns
@@ -28,11 +30,28 @@
           (utils/wrap-after (fn [_] (swap! indent dec) (println-level @indent "Finished" ks)))))
       g)))
 
+
+(s/defn profile-wrap :- utils/Graph
+  "Print timbre profiling after each graph key is generated"
+  [g :- utils/Graph]
+  (plumbing.map/map-leaves-and-path
+    (fn [ks f]
+      (utils/wrap
+        f
+        (fn [& args]
+          (profiling/profile :info :Graph
+            (profiling/p (str ks) (apply f args))))))
+    g))
+
+(defn wrap-fn-profile
+  [label f]
+  (utils/wrap f (fn [& args] (profiling/p label (apply f args)))))
+
 (def profile-fns-wrap
   "Add timbre profile to each function"
   (partial utils/map-leaf-fns
-    (fnk profile-wrap-inner [f ks]
-      (utils/wrap f (fn [& args] (profiling/p (str ks) (apply f args)))))))
+    (fnk profile-wrap-inner [ks f]
+      (wrap-fn-profile (str ks :inner) f))))
 
 (s/defn print-profile-gen-wrap :- search/SearchGraph
   "Prints the total profiling after each generation"

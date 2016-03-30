@@ -12,6 +12,6 @@
   {:index 0
    :individuals (utils/repeatedly-set n (fn []
                                           {:genome (->genome)
-                                           :parents-ids #{}
+                                           :parent-ids #{}
                                            :id (utils/id)
                                            :traits {}}))})

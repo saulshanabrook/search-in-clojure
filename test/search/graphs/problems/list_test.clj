@@ -5,8 +5,8 @@
             [search.graphs.problems.test-utils :refer [finishes]]))
 (use-fixtures :once schema.test/validate-schemas)
 
-(deftest hill-climb-test
+(deftest ^:slow hill-climb-test
   (finishes ['search.graphs.problems.list/graph 'search.graphs.algorithms.hill-climb/graph]))
 
-(deftest genetic-algorithm-test
+(deftest ^:slow genetic-algorithm-test
   (finishes ['search.graphs.problems.list/graph 'search.graphs.algorithms.genetic/graph]))

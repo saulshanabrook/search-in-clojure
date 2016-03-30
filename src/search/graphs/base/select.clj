@@ -1,6 +1,5 @@
 (ns search.graphs.base.select
   (:require [schema.core :as s]
-            [clojure.data.generators]
             [plumbing.core :refer [defnk]]
 
             [search.core :as search]
@@ -16,7 +15,7 @@
 (def TraitSpec {:lowest? s/Bool})
 (def TraitSpecs {search/TraitKey TraitSpec})
 
-(defnk-fn roulette :- s/Any ; :- (utils/InfSeq search/Individual)
+(defnk-fn roulette :- search/Individual
   "Selects parent individuals, proportional to the `trait-name` trait of the
   of individual. A higher value will cause the individual to be selected more
   often (or opposite if `lowest?`).
@@ -30,7 +29,7 @@
                   ((if (-> trait-key trait-specs :lowest?) invert-list identity))
                   (map vector inds)
                   (into {}))]
-    (repeatedly (partial clojure.data.generators/weighted weights))))
+    (utils/weighted weights)))
 
 (def max-num Float/MAX_VALUE)
 (def min-num Float/MIN_VALUE)
@@ -56,29 +55,40 @@
      #(get-in % [:traits trait-key]))
    inds))
 
-(defnk-fn dominates :- s/Any ; :- s(utils/InfSeq search/Individual)
+(defnk all-best-trait :- #{search/Individual}
+  "Returns the best individuals according to the `trait-key` trait"
+  [inds :- #{search/Individual}
+   trait-key :- search/TraitKey
+   trait-spec :- TraitSpec]
+  (utils/all-nil-comp-key
+    #(get-in % [:traits trait-key])
+    (if (:lowest? trait-spec) < >)
+    inds))
+
+(defnk-fn dominates :- search/Individual
   "Selects the parent with the highest (or lowest if `lowest?`) `trait-name`.
 
    Single opjective selection."
   [trait-specs :- TraitSpecs
    trait-key :- search/TraitKey]
   [inds :- #{search/Individual}]
-  (repeat (best-trait {:inds inds
-                       :trait-key trait-key
-                       :trait-spec (trait-specs trait-key)})))
+  (best-trait {:inds inds
+               :trait-key trait-key
+               :trait-spec (trait-specs trait-key)}))
 
-(defnk-fn lexicase :- s/Any ; :- s(utils/InfSeq search/Individual)
-  "Chooses the individuals by selecting the one that does the best on each
-   trait, when we order the traits randomly."
+(defnk-fn lexicase :- search/Individual
+  "Lexicase selection as defined in
+   https://push-language.hampshire.edu/t/lexicase-selection/90."
   [trait-specs :- TraitSpecs]
   [inds :- #{search/Individual}]
-  (cycle
-    (map
-     (fn [[trait-key trait-spec]]
-       (best-trait {:inds inds
-                    :trait-key trait-key
-                    :trait-spec trait-spec}))
-     (-> trait-specs seq clojure.data.generators/shuffle))))
+  (loop [candidates inds
+         cases (-> trait-specs seq clojure.data.generators/shuffle)]
+    (if (or (= 1 (count candidates)) (empty? cases))
+      (clojure.data.generators/rand-nth (seq candidates))
+      (let [[[trait-key trait-spec] & r_cases] cases]
+         (recur
+           (all-best-trait {:inds candidates :trait-key trait-key :trait-spec trait-spec})
+           r_cases)))))
 
 (s/defn sum-of-squares :- (s/maybe s/Num)
   "Returns the sum of the squared values or `nil` if any are `nil`."

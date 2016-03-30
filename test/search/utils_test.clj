@@ -178,3 +178,16 @@
   (is (= 3 (utils/eval-load-ns `some-var)))
   (is (thrown? Exception (utils/eval-load-ns 'some-madeup-ns/dfd)))
   (is (utils/eval-load-ns 'search.core-test/config->generations-test)))
+
+(deftest all-nil-comp-key-test
+  (is (=
+        #{["a" 1] ["c" 1]}
+        (utils/all-nil-comp-key second < [["d" 2] ["a" 1] ["b" 2] ["c" 1] ["j" nil]])))
+  (is (= #{} (utils/all-nil-comp-key identity < [])))
+  (is (= #{["a" nil] ["b" nil]} (utils/all-nil-comp-key second < [["a" nil] ["b" nil]]))))
+
+(deftest interleave-weighted-test
+  (is (= [1 1 1] (take 3 (utils/interleave-weighted {(cycle [1]) 1
+                                                     (cycle [0]) 0}))))
+  (is (= [1 2 1] (take 3 (utils/interleave-weighted {(cycle [1 2]) 1
+                                                     (cycle [0]) 0})))))

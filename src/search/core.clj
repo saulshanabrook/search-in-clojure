@@ -13,14 +13,18 @@
 
 (def Traits
   "Traits are any information we want to know about an indivual. For single
-  objective search we commonly use a `:value` trait."
+  objective search we commonly use a `:value` trait.
+
+  They are a superset testcases, because they could also include things Like
+  performance characteristcs. Currently everything 'about' the individual is
+  stored in this one flat map called `traits`"
   {TraitKey TraitValue})
 
 (def Individual
   {:genome Genome
    :id s/Str
    :traits Traits
-   :parents-ids #{s/Str}})
+   :parent-ids #{s/Str}})
 
 (def Generation
   "Holds the whole state for a current generation of individuals."

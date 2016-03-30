@@ -30,9 +30,13 @@
                              [lein-codox "0.9.4"]
                              [lein-exec "0.3.6"]
                              [lein-gorilla "0.3.6"]]}}
-
-
-  :aliases {"test-all" ["do" ["check"] ["kibit"] ["eastwood"] ["test"]]
+  :test-selectors {:default (complement :slow)
+                   :slow :slow}
+  :aliases {"test-all" ["do"
+                        ["check"]
+                        ; ["kibit"]
+                        ["eastwood"]
+                        ["test"]]
             "slamhound" ["run" "-m" "slam.hound"]}
   :eastwood {:linters [:all]
              :exclude-namespaces [search.conjure-utils]
