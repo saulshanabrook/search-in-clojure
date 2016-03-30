@@ -4,13 +4,13 @@
             [plumbing.core :refer [fnk]]
             [schema.experimental.generators :as g]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.cli :as cli]))
 
 (use-fixtures :once schema.test/validate-schemas)
 
 (def dep-graph {:n (fnk [] 10)})
-(def graph {:generations (fnk [n] (repeatedly n (partial g/generate search/Generation)))})
+(def graph {:generations (fnk [n] (repeatedly n (partial g/generate schemas/Generation)))})
 
 (deftest ^:slow test-main
   (testing "graphs"

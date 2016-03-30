@@ -15,11 +15,11 @@
   It requires nodes:
 
       {
-        :->genome (s/=> search/Genome)
-        :tweak (s/=> [search/Individual] [search/Individual])
-        :genome->traits (s/=> search/Traits search/Genome)})))
-        :select (s/=> search/Individual [search/Individual])
-        :done? (s/=> s/Bool search/Generation)
+        :->genome (s/=> schemas/Genome)
+        :tweak (s/=> [schemas/Individual] [schemas/Individual])
+        :genome->traits (s/=> schemas/Traits schemas/Genome)})))
+        :select (s/=> schemas/Individual [schemas/Individual])
+        :done? (s/=> s/Bool schemas/Generation)
       }
   "
   (g/graph

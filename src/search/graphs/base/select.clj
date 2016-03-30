@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [plumbing.core :refer [defnk]]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :refer [defnk-fn] :as utils]))
 
 (s/defn invert-list :- [long]
@@ -13,17 +13,17 @@
     (map #(long (/ max_ %)) xs)))
 
 (def TraitSpec {:lowest? s/Bool})
-(def TraitSpecs {search/TraitKey TraitSpec})
+(def TraitSpecs {schemas/TraitKey TraitSpec})
 
-(defnk-fn roulette :- search/Individual
+(defnk-fn roulette :- schemas/Individual
   "Selects parent individuals, proportional to the `trait-name` trait of the
   of individual. A higher value will cause the individual to be selected more
   often (or opposite if `lowest?`).
 
   This is a single objective selection."
   [trait-specs :- TraitSpecs
-   trait-key :- search/TraitKey]
-  [inds :- #{search/Individual}]
+   trait-key :- schemas/TraitKey]
+  [inds :- #{schemas/Individual}]
   (let [weights (->> inds
                   (map #(get-in % [:traits trait-key]))
                   ((if (-> trait-key trait-specs :lowest?) invert-list identity))
@@ -44,9 +44,9 @@
   [k & args]
   (apply max-key (comp #(if (nil? %1) min-num %1) k) args))
 
-(defnk best-trait :- search/Individual
-  [inds :- #{search/Individual}
-   trait-key :- search/TraitKey
+(defnk best-trait :- schemas/Individual
+  [inds :- #{schemas/Individual}
+   trait-key :- schemas/TraitKey
    trait-spec :- TraitSpec]
   "Returns best individual according the `trait-key` trait."
   (apply
@@ -55,32 +55,32 @@
      #(get-in % [:traits trait-key]))
    inds))
 
-(defnk all-best-trait :- #{search/Individual}
+(defnk all-best-trait :- #{schemas/Individual}
   "Returns the best individuals according to the `trait-key` trait"
-  [inds :- #{search/Individual}
-   trait-key :- search/TraitKey
+  [inds :- #{schemas/Individual}
+   trait-key :- schemas/TraitKey
    trait-spec :- TraitSpec]
   (utils/all-nil-comp-key
     #(get-in % [:traits trait-key])
     (if (:lowest? trait-spec) < >)
     inds))
 
-(defnk-fn dominates :- search/Individual
+(defnk-fn dominates :- schemas/Individual
   "Selects the parent with the highest (or lowest if `lowest?`) `trait-name`.
 
    Single opjective selection."
   [trait-specs :- TraitSpecs
-   trait-key :- search/TraitKey]
-  [inds :- #{search/Individual}]
+   trait-key :- schemas/TraitKey]
+  [inds :- #{schemas/Individual}]
   (best-trait {:inds inds
                :trait-key trait-key
                :trait-spec (trait-specs trait-key)}))
 
-(defnk-fn lexicase :- search/Individual
+(defnk-fn lexicase :- schemas/Individual
   "Lexicase selection as defined in
    https://push-language.hampshire.edu/t/lexicase-selection/90."
   [trait-specs :- TraitSpecs]
-  [inds :- #{search/Individual}]
+  [inds :- #{schemas/Individual}]
   (loop [candidates inds
          cases (-> trait-specs seq clojure.data.generators/shuffle)]
     (if (or (= 1 (count candidates)) (empty? cases))
@@ -108,5 +108,5 @@
 
 (s/defn least-sum-squares :- s/Any
   "Orders the individuals by the sum of their square traits and chooses the least"
-  [inds :- #{search/Individual}]
+  [inds :- #{schemas/Individual}]
   (cycle (sort-by #(->> % :traits vals sum-of-squares) (comparator less-than-null) inds)))

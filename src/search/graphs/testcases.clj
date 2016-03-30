@@ -7,7 +7,7 @@
             [plumbing.core :refer [fnk]]
             [schema.core :as s]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :refer [defnk-fn]]))
 
 (def TestInput s/Any)
@@ -15,15 +15,15 @@
 (def TestCases {TestInput TestOutput})
 (def TestFn
   "Uses the genome to evaluate the test-input, returning the test-output"
-  (s/=> TestOutput search/Genome TestInput))
+  (s/=> TestOutput schemas/Genome TestInput))
 
 (def TestOutput->TraitValue
   "Takes the intended test case output and the computed test case output
    and returns the 'value' for this pair. For example, this could take the
    squared difference between the two, or just the absolute value of the difference."
-  (s/=> search/TraitValue TestOutput TestOutput))
+  (s/=> schemas/TraitValue TestOutput TestOutput))
 
-(defnk-fn testcases->traits :- search/Traits
+(defnk-fn testcases->traits :- schemas/Traits
   "Evaluates the `test-fn` on each of the inputs in `test-cases`. The traits
   it returns have keys equal to the test cases inputs and the outputs
   computed by calling `test-output->trait-value` on each actual value, to computed
@@ -31,7 +31,7 @@
   [test-cases :- TestCases
    test-output->trait-value :- TestOutput->TraitValue
    test-fn :- TestFn]
-  [genome :- search/Genome]
+  [genome :- schemas/Genome]
   (into {}
     (map
       (fn [[t-in t-out]]

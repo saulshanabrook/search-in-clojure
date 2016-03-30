@@ -2,10 +2,10 @@
   (:require [schema.core :as s]
             [plumbing.core :refer [defnk]]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :as utils]))
 
-(defnk generations ; :- (possibly infinite) lazy [search/Generation]
+(defnk generations ; :- (possibly infinite) lazy [schemas/Generation]
   "Basic high level algorithm that will cover most use cases.
 
   1. Gets the initial generation from `initial`.
@@ -15,10 +15,10 @@
     1. If yes then return the current generation
     2. If no, then recur with a new generation, from `step`,
        to step 2."
-  [initial :- search/Generation
-   evaluate :- (s/=> search/Generation search/Generation)
-   done? :- (s/=> s/Bool search/Generation)
-   step :- (s/=> search/Generation search/Generation)]
+  [initial :- schemas/Generation
+   evaluate :- (s/=> schemas/Generation schemas/Generation)
+   done? :- (s/=> s/Bool schemas/Generation)
+   step :- (s/=> schemas/Generation schemas/Generation)]
   (utils/take-until
     done?
     (iterate (comp evaluate step) (evaluate initial))))

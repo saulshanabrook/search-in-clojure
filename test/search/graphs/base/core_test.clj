@@ -5,7 +5,7 @@
             [conjure.core :as conjure]
             [com.rpl.specter :as sp]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.base.core :as base]))
 (use-fixtures :once schema.test/validate-schemas)
 
@@ -13,8 +13,8 @@
 (defn step_ [gen] (update-in gen [:index] inc))
 (deftest generations-graph-test
   (conjure/instrumenting [step_]
-    (let [initial-ind (-> search/Individual g/generate (assoc :traits {:value 0}))
-          initial (-> search/Generation g/generate (assoc :index 0
+    (let [initial-ind (-> schemas/Individual g/generate (assoc :traits {:value 0}))
+          initial (-> schemas/Generation g/generate (assoc :index 0
                                                           :individuals #{initial-ind}))
           value-path [:individuals sp/ALL :traits :value]
           generations (base/generations {:initial initial

@@ -3,7 +3,7 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.push :as push]
             [search.graphs.testcases :as testcases]
             [search.graphs.base.select :as select]
@@ -22,7 +22,7 @@
 (utils/defnk-fn traits->done? :- s/Bool
   "We are done if every trait is within `wiggle-room` of 0."
   [wiggle-room :- s/Num]
-  [traits :- search/Traits]
+  [traits :- schemas/Traits]
   (->> traits
     vals
     (every? (partial about-equal wiggle-room 0))))

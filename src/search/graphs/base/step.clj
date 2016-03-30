@@ -4,23 +4,23 @@
             [plumbing.graph :as g]
 
             [search.utils :refer [defnk-fn] :as utils]
-            [search.core :as search]))
+            [search.schemas :as schemas]))
 
-(defnk-fn breed-> :- search/Generation
+(defnk-fn breed-> :- schemas/Generation
   "Step to the next generation by taking the first `n` individuals from calling
   `breed` on the current generation."
   [n :- s/Int
-   breed :- (s/=> (utils/InfSeq search/Individual) search/Generation)]
-  [generation :- search/Generation]
+   breed :- (s/=> (utils/InfSeq schemas/Individual) schemas/Generation)]
+  [generation :- schemas/Generation]
   {:index       (inc (:index generation))
    :individuals (utils/take-set n (breed generation))})
 
-(def Select (s/=> search/Individual #{search/Individual}))
+(def Select (s/=> schemas/Individual #{schemas/Individual}))
 (def Tweak
   "Take in some number of parent genomes and return a set of child genomes.
 
    mutate and crossover are two common examples"
-  {:f (s/=> (s/cond-pre [search/Genome] search/Genome) & [search/Genome])
+  {:f (s/=> (s/cond-pre [schemas/Genome] schemas/Genome) & [schemas/Genome])
    :n-parents s/Int
    :multiple-children? s/Bool})
 
@@ -31,7 +31,7 @@
   [? val]
   (if ? [val] val))
 
-(defnk-fn weighted-tweaks->children :- s/Any ;- (utils/InfSeq search/Individual)
+(defnk-fn weighted-tweaks->children :- s/Any ;- (utils/InfSeq schemas/Individual)
   "Returns an infinite lazy sequence of possible offspring.
 
   Chooses children from each pipeline of tweaks using the `tweak-label-weights`.
@@ -39,8 +39,8 @@
   or a sequence of labels."
   [tweak-labels :- {TweakLabel Tweak}
    tweak-label-weights :- {(s/cond-pre TweakLabel [TweakLabel]) s/Int}
-   tweaks->children :- (s/=> (utils/InfSeq search/Individual) [Tweak] search/Generation)]
-  [generation :- search/Generation]
+   tweaks->children :- (s/=> (utils/InfSeq schemas/Individual) [Tweak] schemas/Generation)]
+  [generation :- schemas/Generation]
   (->> tweak-label-weights
      (map-keys #(->> %1
                   (->seq-if (keyword? %1))
@@ -48,9 +48,9 @@
                   (tweaks->children generation)))
      utils/interleave-weighted))
 
-(defnk ->child-individual :- search/Individual
+(defnk ->child-individual :- schemas/Individual
   [parent-ids :- #{s/Str}
-   genome :- search/Genome]
+   genome :- schemas/Genome]
   {:id (utils/id)
    :genome genome
    :parent-ids parent-ids
@@ -78,11 +78,11 @@
                             :parent-ids parent-ids))))))))
 
 
-(defnk-fn tweaks->children_ :- s/Any ;- (utils/InfSeq search/Individual)
+(defnk-fn tweaks->children_ :- s/Any ;- (utils/InfSeq schemas/Individual)
   "Takes a pipeline of tweaks and a way to get a parent, and returns a sequence
   of children with that tweaks applied to the parents in that order"
   [select :- Select]
-  [{individuals :individuals} :- search/Generation
+  [{individuals :individuals} :- schemas/Generation
    tweaks :- [Tweak]]
   (let [->parent (partial select individuals)]
     (->> tweaks

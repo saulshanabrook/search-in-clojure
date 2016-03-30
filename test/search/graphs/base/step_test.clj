@@ -4,17 +4,17 @@
             [schema.experimental.generators :as g]
             [conjure.core :refer :all]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.base.step :as step]
             [search.utils :as utils]))
 (use-fixtures :once schema.test/validate-schemas)
 
 (deftest breed->-test
   (let [n 10
-        ->ind #(g/generate search/Individual)
+        ->ind #(g/generate schemas/Individual)
         inds (utils/repeatedly-set n ->ind)
         generation (->
-                    search/Generation
+                    schemas/Generation
                     g/generate
                     (assoc :index 0
                            :individuals inds))]
@@ -37,8 +37,8 @@
   (let [->tweak (fn [] {:f (fn [_] nil) :n-parents 1 :multiple-children? true})
         tweak-1 (->tweak)
         tweak-2 (->tweak)
-        ind (g/generate search/Individual)
-        gen (g/generate search/Generation)]
+        ind (g/generate schemas/Individual)
+        gen (g/generate schemas/Generation)]
     (stubbing [t->c-dummy (repeat ind)]
       (let [breed (step/weighted-tweaks->children
                      {:tweak-labels {:1 tweak-1 :2 tweak-2}
@@ -51,14 +51,14 @@
         (verify-call-times-for t->c-dummy 2)))))
 
 (deftest tweaks->children_-test
-  (let [->ind #(-> search/Individual
+  (let [->ind #(-> schemas/Individual
                 g/generate
                 (assoc :genome %))
         ind-1 (->ind 1)
         ind-2 (->ind 2)
         select-fn (utils/seq->fn (cycle [ind-1 ind-2]))
         t->c (step/tweaks->children_ {:select (fn [_] (select-fn))})
-        gen (-> search/Generation
+        gen (-> schemas/Generation
              g/generate
              (assoc :individuals #{ind-1 ind-2}))
         tweak-add-and-mult {:f (fn [a b] [(+ a b) (* a b)])

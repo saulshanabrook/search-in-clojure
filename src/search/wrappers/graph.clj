@@ -4,7 +4,7 @@
             [taoensso.timbre.profiling :as profiling]
 
             [search.utils :as utils]
-            [search.core :as search]))
+            [search.schemas :as schemas]))
 
 (defn println-level
   "Like println but indents by `indent` first."
@@ -53,9 +53,9 @@
     (fnk profile-wrap-inner [ks f]
       (wrap-fn-profile (str ks :inner) f))))
 
-(s/defn print-profile-gen-wrap :- search/SearchGraph
+(s/defn print-profile-gen-wrap :- schemas/SearchGraph
   "Prints the total profiling after each generation"
-  [{->gens :generations :as g} :- search/SearchGraph]
+  [{->gens :generations :as g} :- schemas/SearchGraph]
   (assoc g :generations
     (utils/wrap ->gens
       (fn [m]

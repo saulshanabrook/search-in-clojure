@@ -50,4 +50,4 @@
   :hiera {:cluster-depth 3
           :trim-ns-prefix true
           :path "docs/ns-hierarchy.png"
-          :ignore-ns #{search.schemas search.graphs.base.schemas search.config.schemas}})
+          :ignore-ns #{search.schemas search.graphs.base.schemas search.config.schemas search.utils}})

@@ -9,7 +9,7 @@
 
             [search.wrappers.recorders :as recorders]
             [search.utils :as utils]
-            [search.core :as search]))
+            [search.schemas :as schemas]))
 
 (use-fixtures :once schema.test/validate-schemas)
 
@@ -19,7 +19,7 @@
 
 (deftest wrap-test
   (conjure/instrumenting [started! generation! done!]
-    (let [gens (repeatedly 10 #(g/generate search/Generation))
+    (let [gens (repeatedly 10 #(g/generate schemas/Generation))
           metadata (g/generate recorders/Metadata {utils/Probability (generators/choose 0 1)})
           g (assoc (plumbing.core/map-vals utils/v->fnk metadata)
               :generations (fnk [] gens))

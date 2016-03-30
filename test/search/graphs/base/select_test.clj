@@ -3,7 +3,7 @@
             [schema.test]
             [schema.experimental.generators :as g]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.base.select :as select]))
 
 (use-fixtures :once schema.test/validate-schemas)
@@ -14,7 +14,7 @@
 (deftest roulette-test
   (let [select_ (select/roulette {:trait-key :value
                                   :trait-specs {:value {:lowest? false}}})
-        ->individual #(assoc (g/generate search/Individual) :traits {:value %})
+        ->individual #(assoc (g/generate schemas/Individual) :traits {:value %})
         bad_ind (->individual 1)
         good_ind (->individual 10000000)]
     (is (= bad_ind (select_ #{bad_ind})))
@@ -24,7 +24,7 @@
 (deftest dominates-test
   (let [->select #(select/dominates {:trait-key :value
                                      :trait-specs {:value {:lowest? %}}})
-        ->individual #(assoc (g/generate search/Individual) :traits {:value %})
+        ->individual #(assoc (g/generate schemas/Individual) :traits {:value %})
         small_ind (->individual -10)
         large_ind (->individual 0)]
     (is (= large_ind ((->select false) #{large_ind})))
@@ -37,7 +37,7 @@
     (is (= small_ind ((->select true) #{small_ind large_ind})))))
 
 (deftest all-best-trait-test
-  (let [->ind #(assoc (g/generate search/Individual) :traits {:value %})
+  (let [->ind #(assoc (g/generate schemas/Individual) :traits {:value %})
         abt #(select/all-best-trait {:inds %
                                      :trait-key :value
                                      :trait-spec {:lowest? false}})
@@ -61,7 +61,7 @@
 
 (deftest lexicase-test
   (with-redefs [clojure.data.generators/shuffle sort]
-    (let [->ind #(assoc (g/generate search/Individual) :traits %)
+    (let [->ind #(assoc (g/generate schemas/Individual) :traits %)
           lex (select/lexicase {:trait-specs {:a {:lowest? false}
                                               :b {:lowest? true}}})
           is-chosen #(is (= %1 (lex %2)))]
@@ -82,7 +82,7 @@
         (is (contains? #{x y} (lex #{x y})))))))
 
 (deftest least-sum-squares-test
-  (let [->ind #(assoc (g/generate search/Individual) :traits %)
+  (let [->ind #(assoc (g/generate schemas/Individual) :traits %)
         nil-ind (->ind {:x nil :y 1})
         four-ind (->ind {:x 2})
         six-ind (->ind {:x -2 :y -1 :z -1})

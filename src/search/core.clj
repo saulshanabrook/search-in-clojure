@@ -2,61 +2,11 @@
   (:require [schema.core :as s]
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk defnk]]
-            [plumbing.fnk.schema]
 
+            [search.schemas :as schemas]
             [search.utils :as utils]))
 
-(def Genome s/Any)
-
-(def TraitKey s/Any)
-(def TraitValue (s/maybe s/Num))
-
-(def Traits
-  "Traits are any information we want to know about an indivual. For single
-  objective search we commonly use a `:value` trait.
-
-  They are a superset testcases, because they could also include things Like
-  performance characteristcs. Currently everything 'about' the individual is
-  stored in this one flat map called `traits`"
-  {TraitKey TraitValue})
-
-(def Individual
-  {:genome Genome
-   :id s/Str
-   :traits Traits
-   :parent-ids #{s/Str}})
-
-(def Generation
-  "Holds the whole state for a current generation of individuals."
-  {:index s/Int
-   :individuals #{Individual}})
-
-(def Wrapper s/Any)
-
-(def Config
-  "A search configuration is represented as a map. It contains all the data
-   neccesary to run the search in a serializiable form, so that it can be
-   preserved in a text form.
-
-   The most important are the `graph-symbols`. These are a list of symbols
-   that should point to partial graphs which are all merged.
-
-   Then `values` are used to override keys with values.
-
-   The `wrapper-forms` represent a sequence of functions that take in a graph
-   and return an updated graph. Each one, when `eval`ed, should return a
-   function. All needed namespaces will be imported.
-
-   For example, if search.wrappers/log is function that takes a key and a graph
-   and returned an updated graph, the `wrapper-forms` could be
-   `[(partial search.wrappers/log :some-key)]`."
-  {:graph-symbols [s/Symbol]
-   :values {s/Keyword s/Any}
-   :wrapper-forms [Wrapper]})
-
-(def SearchGraph (s/constrained utils/Graph #(contains? % :generations)))
-
-(defnk ->config :- Config
+(defnk ->config :- schemas/Config
   [graph-symbols
    {values {}}
    {wrapper-forms []}]
@@ -75,7 +25,7 @@
                   (->> values
                     (plumbing.core/map-vals utils/v->fnk)
                     g/graph))
-   :wrappers (fnk [wrapper-forms :- [Wrapper]] (map utils/eval-load-ns wrapper-forms))
+   :wrappers (fnk [wrapper-forms :- [schemas/Wrapper]] (map utils/eval-load-ns wrapper-forms))
    :wrapper (fnk [wrappers :- [(s/=> utils/Graph utils/Graph)]] (apply comp (reverse wrappers)))
    :final-graph (fnk [default-graph :- utils/Graph
                       graph :- utils/Graph
@@ -85,14 +35,14 @@
                   (g/graph graph)
                   (merge values-graph)
                   wrapper))
-   :computed (fnk [final-graph :- SearchGraph] (g/run final-graph {}))))
+   :computed (fnk [final-graph :- schemas/SearchGraph] (g/run final-graph {}))))
 
 (def compute-search (g/compile compute-search-graph))
 
 (s/defn config->generations ; infinite sequence of generations
   "Computes the generations for this config. Returns a (possibly infinite)
   lazy sequence of generations. The computation happens when you resolve them."
-  [config :- Config]
+  [config :- schemas/Config]
   (-> config
     compute-search
     :computed

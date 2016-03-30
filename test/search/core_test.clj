@@ -5,11 +5,12 @@
             [plumbing.core :refer [fnk]]
 
             [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :as utils]))
 
 (use-fixtures :once schema.test/validate-schemas)
 
-(def generation (g/generate search/Generation))
+(def generation (g/generate schemas/Generation))
 
 (def simple-graph
   {:generations (fnk [] (repeat generation))})
@@ -21,7 +22,7 @@
   {:generations (fnk [something] (repeat something))})
 
 (def takes-map-graph
-  {:generations (fnk [some-map :- {:generation search/Generation}]
+  {:generations (fnk [some-map :- {:generation schemas/Generation}]
                  (repeat (some-map :generation)))})
 
 (defn change-something
@@ -45,7 +46,7 @@
                        `depends-on-base-graph]}))
 
   (testing "values override"
-    (let [other-gen (g/generate search/Generation)]
+    (let [other-gen (g/generate schemas/Generation)]
       (is-first-generation
         other-gen
         {:graph-symbols [`base-graph
@@ -59,10 +60,10 @@
        :values {:some-map {:generation generation}}}))
 
   (testing "multiple wrappers"
-    (let [other-gen (g/generate search/Generation)]
+    (let [other-gen (g/generate schemas/Generation)]
       (is-first-generation
         other-gen
         {:graph-symbols [`depends-on-base-graph]
-         :wrapper-forms `[(partial change-something '~(g/generate search/Generation))
+         :wrapper-forms `[(partial change-something '~(g/generate schemas/Generation))
                           (partial change-something '~other-gen)
                           identity]}))))

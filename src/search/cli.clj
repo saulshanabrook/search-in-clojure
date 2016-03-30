@@ -3,7 +3,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.string]
 
-            [search.core :as search])
+            [search.core :as search]
+            [search.schemas :as schemas])
   (:gen-class))
 
 (def cli-options
@@ -51,6 +52,6 @@
       errors (exit 1 (error-msg errors)))
     (when (:validate-schema options) (s/set-fn-validation! true))
     (-> options
-      (select-keys (keys search/Config))
+      (select-keys (keys schemas/Config))
       search/config->generations
       dorun)))

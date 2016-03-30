@@ -1,14 +1,14 @@
 (ns search.graphs.base.evaluate
   (:require [schema.core :as s]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :refer [defnk-fn]]))
 
-(defnk-fn genome->traits-> :- search/Generation
+(defnk-fn genome->traits-> :- schemas/Generation
   "Return an evaluated generation by settings the traits for each individual
    based on its genome"
-  [genome->traits :- (s/=> search/Traits search/Genome)]
-  [generation :- search/Generation]
+  [genome->traits :- (s/=> schemas/Traits schemas/Genome)]
+  [generation :- schemas/Generation]
   (assoc generation :individuals
     (set
       (pmap

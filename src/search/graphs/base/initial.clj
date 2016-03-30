@@ -2,12 +2,12 @@
   (:require [schema.core :as s]
             [plumbing.core :refer [defnk]]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.utils :as utils]))
 
-(defnk ->genome-> :- search/Generation
+(defnk ->genome-> :- schemas/Generation
   "Create an initial generation by making `n` genomes from `->genome`"
-  [->genome :- (s/=> search/Genome)
+  [->genome :- (s/=> schemas/Genome)
    n :- s/Int]
   {:index 0
    :individuals (utils/repeatedly-set n (fn []

@@ -7,14 +7,14 @@
             [taoensso.timbre :as timbre]
             [puget.printer :as puget]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.base.select :as select]
             [search.utils :as utils]))
 
 (def Metadata
   "Metadata about the search, including its configuration, id, and the trait specs."
   {:id s/Str
-   :config search/Config
+   :config schemas/Config
    (s/optional-key :trait-specs) select/TraitSpecs
    (s/optional-key :population-size) s/Int
    (s/optional-key :n-genes) s/Int
@@ -26,14 +26,14 @@
 (def Recorder
   "responsible for displaying or saving the resaults of an execution."
   {:started! (s/=> nil Metadata)
-   :generation! (s/=> nil Metadata search/Generation)
+   :generation! (s/=> nil Metadata schemas/Generation)
    :done! (s/=> nil Metadata)})
 
 
-(s/defn wrap :- search/SearchGraph
+(s/defn wrap :- schemas/SearchGraph
   "Modify graph g so that it records the run as it progresses"
   [{:keys [started! generation! done!]} :- Recorder
-   {->gens :generations :as g} :- search/SearchGraph]
+   {->gens :generations :as g} :- schemas/SearchGraph]
   (assoc g :generations
     (pfnk/fn->fnk
       (fn [m]
@@ -49,13 +49,13 @@
 
 (s/def timbre :- Recorder
   {:started! (s/fn [md :- Metadata] (timbre/info "Created " md))
-   :generation! (s/fn [md :- Metadata generation :- search/Generation] (timbre/info "Generation " generation))
+   :generation! (s/fn [md :- Metadata generation :- schemas/Generation] (timbre/info "Generation " generation))
    :done! (s/fn [md :- Metadata] (timbre/info "Finished " md))})
 
-(s/defn get-best-traits :- search/Traits
+(s/defn get-best-traits :- schemas/Traits
   "Returns a map of each trait value with its best value out of all the inds"
   [trait-specs :- select/TraitSpecs
-   inds :- #{search/Individual}]
+   inds :- #{schemas/Individual}]
   (->> trait-specs
    seq
    (mapcat
@@ -74,7 +74,7 @@
    for each trait."
   {:started! (fn [_] nil)
    :generation! (s/fn [{trait-specs :trait-specs} :- Metadata
-                       {individuals :individuals} :- search/Generation]
+                       {individuals :individuals} :- schemas/Generation]
                   (println (get-best-traits trait-specs individuals)))
    :done! (fn [_] nil)})
 
@@ -82,7 +82,7 @@
   "Prints the individual with the traits that are the closest to 0, by summing
    them"
    {:started! (fn [md] (puget/cprint md))
-    :generation! (s/fn [_ {inds :individuals} :- search/Generation]
+    :generation! (s/fn [_ {inds :individuals} :- schemas/Generation]
                    (puget/cprint
                      (apply select/min-key-null
                        (fn [i] (some->> i

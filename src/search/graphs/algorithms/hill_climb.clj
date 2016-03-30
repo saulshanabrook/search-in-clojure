@@ -3,7 +3,7 @@
             [plumbing.graph :as g]
             [plumbing.core :refer [fnk]]
 
-            [search.core :as search]
+            [search.schemas :as schemas]
             [search.graphs.base.core :as base]
             [search.graphs.base.initial :as initial]
             [search.graphs.base.step :as step]
@@ -11,14 +11,14 @@
             [search.utils :refer [defnk-fn] :as utils]))
 
 
-(defnk-fn breed :- [search/Individual]
+(defnk-fn breed :- [schemas/Individual]
   "Mutates the parent individual, scores it with `genome->traits` and then
   selects
    ."
-  [select :- (s/=> (utils/InfSeq search/Individual) #{search/Individual})
-   genome->traits :-  (s/=> search/Traits search/Genome)
-   mutate :- (s/=> search/Genome search/Genome)]
-  [{[& [parent]] :individuals :- search/Generation}]
+  [select :- (s/=> (utils/InfSeq schemas/Individual) #{schemas/Individual})
+   genome->traits :-  (s/=> schemas/Traits schemas/Genome)
+   mutate :- (s/=> schemas/Genome schemas/Genome)]
+  [{[& [parent]] :individuals :- schemas/Generation}]
   (let [old-genome (:genome parent)
         new-genome (mutate old-genome)
         new-ind (assoc
