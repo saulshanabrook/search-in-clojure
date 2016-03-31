@@ -1,8 +1,10 @@
 (ns search.core-test
   (:require [clojure.test :refer :all]
+            [schema.core :as s]
             [schema.test]
             [schema.experimental.generators :as g]
             [plumbing.core :refer [fnk]]
+            [clojure.test.check.generators :as generators]
 
             [search.core :as search]
             [search.schemas :as schemas]
@@ -10,7 +12,10 @@
 
 (use-fixtures :once schema.test/validate-schemas)
 
-(def generation (g/generate schemas/Generation))
+(def ->generation
+  (partial g/generate schemas/Generation {s/Any (generators/choose 0 1)}))
+
+(def generation (->generation))
 
 (def simple-graph
   {:generations (fnk [] (repeat generation))})
@@ -46,7 +51,7 @@
                        `depends-on-base-graph]}))
 
   (testing "values override"
-    (let [other-gen (g/generate schemas/Generation)]
+    (let [other-gen (->generation)]
       (is-first-generation
         other-gen
         {:graph-symbols [`base-graph
@@ -60,10 +65,10 @@
        :values {:some-map {:generation generation}}}))
 
   (testing "multiple wrappers"
-    (let [other-gen (g/generate schemas/Generation)]
+    (let [other-gen (->generation)]
       (is-first-generation
         other-gen
         {:graph-symbols [`depends-on-base-graph]
-         :wrapper-forms `[(partial change-something '~(g/generate schemas/Generation))
+         :wrapper-forms `[(partial change-something '~(->generation))
                           (partial change-something '~other-gen)
                           identity]}))))
