@@ -78,17 +78,20 @@
                   (println (get-best-traits trait-specs individuals)))
    :done! (fn [_] nil)})
 
+(defn ->smallest-ind
+  [{inds :individuals}]
+  (apply select/min-key-null
+    (fn [i] (some->> i
+             :traits
+             vals
+             ((fn [vs] (when (not-any? nil? vs) vs)))
+             (apply +)))
+    inds))
+
 (s/def smallest-ind
   "Prints the individual with the traits that are the closest to 0, by summing
    them"
    {:started! (fn [md] (puget/cprint md))
-    :generation! (s/fn [_ {inds :individuals} :- schemas/Generation]
-                   (puget/cprint
-                     (apply select/min-key-null
-                       (fn [i] (some->> i
-                                :traits
-                                vals
-                                ((fn [vs] (when (not-any? nil? vs) vs)))
-                                (apply +)))
-                       inds)))
+    :generation! (s/fn [_ gen :- schemas/Generation]
+                   (puget/cprint (->smallest-ind gen)))
     :done! (fn [_] nil)})

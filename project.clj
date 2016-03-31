@@ -31,7 +31,8 @@
                              [lein-cloverage "1.0.6"]
                              [lein-codox "0.9.4"]
                              [lein-exec "0.3.6"]
-                             [lein-gorilla "0.3.6"]]}}
+                             [lein-gorilla "0.3.6"]
+                             [incanter-gorilla "0.1.0"]]}}
   :test-selectors {:default (complement :slow)
                    :slow :slow}
   :aliases {"test-all" ["do"
