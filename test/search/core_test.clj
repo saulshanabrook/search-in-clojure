@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [schema.core :as s]
             [schema.test]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
             [plumbing.core :refer [fnk]]
             [clojure.test.check.generators :as generators]
 

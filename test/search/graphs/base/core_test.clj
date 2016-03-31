@@ -1,7 +1,7 @@
 (ns search.graphs.base.core-test
   (:require [clojure.test :refer :all]
             [schema.test]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
             [conjure.core :as conjure]
             [com.rpl.specter :as sp]
 

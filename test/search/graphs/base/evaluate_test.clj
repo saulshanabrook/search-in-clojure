@@ -1,7 +1,7 @@
 (ns search.graphs.base.evaluate-test
   (:require [clojure.test :refer :all]
             [schema.test]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
             [com.rpl.specter :as sp]
 
             [search.schemas :as schemas]

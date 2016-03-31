@@ -3,7 +3,7 @@
             [conjure.core :as conjure]
             [schema.test]
             [plumbing.core :refer [fnk]]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
             [clojure.test.check.generators :as generators]
             [plumbing.graph]
 

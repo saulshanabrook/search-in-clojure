@@ -6,12 +6,10 @@
   :main ^:skip-aot search.cli
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.generators "0.1.2"]
-                 [prismatic/schema "1.0.4"]
-                 [prismatic/plumbing "0.5.2"]
-                 [com.taoensso/timbre "4.2.1"]
-                 [org.clojure/test.check "0.9.0"]
+                 [prismatic/schema "1.1.0"]
+                 [prismatic/plumbing "0.5.3"]
+                 [com.taoensso/timbre "4.3.1"]
                  [danlentz/clj-uuid "0.1.6"]
-                 [org.clojars.runa/conjure "2.1.3"]
                  [com.rpl/specter "0.9.2"]
                  [slingshot "0.12.2"]
                  [klapaucius "0.1.10-SNAPSHOT"]
@@ -24,15 +22,18 @@
   :profiles {:perf {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=true"
                                "-Dclojure.compiler.direct-linking=true"]
                     :aot [search.cli]}
-             :dev {:dependencies [[slamhound "1.5.5"]]
+             :dev {:dependencies [[slamhound "1.5.5"]
+                                  [prismatic/schema-generators "0.1.0"]
+                                  [org.clojure/test.check "0.9.0"]
+                                  [org.clojars.runa/conjure "2.1.3"]
+                                  [incanter-gorilla "0.1.0"]]
                    :plugins [[lein-kibit "0.1.2"]
                              [jonase/eastwood "0.2.3"]
                              [lein-ancient "0.6.8"]
                              [lein-cloverage "1.0.6"]
                              [lein-codox "0.9.4"]
                              [lein-exec "0.3.6"]
-                             [lein-gorilla "0.3.6"]
-                             [incanter-gorilla "0.1.0"]]}}
+                             [lein-gorilla "0.3.6"]]}}
   :test-selectors {:default (complement :slow)
                    :slow :slow}
   :aliases {"test-all" ["do"

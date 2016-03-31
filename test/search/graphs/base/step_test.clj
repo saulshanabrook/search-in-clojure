@@ -1,7 +1,7 @@
 (ns search.graphs.base.step-test
   (:require [clojure.test :refer :all]
             [schema.test]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
             [conjure.core :refer :all]
 
             [search.schemas :as schemas]

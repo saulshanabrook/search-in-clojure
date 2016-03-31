@@ -1,7 +1,7 @@
 (ns search.graphs.base.done-test
   (:require [clojure.test :refer :all]
             [schema.test]
-            [schema.experimental.generators :as g]
+            [schema-generators.generators :as g]
 
             [search.schemas :as schemas]
             [search.graphs.base.done :as done]))
