@@ -3,12 +3,12 @@
 
             [search.utils :refer [Graph]]))
 
-(def Genome s/Any)
+(s/defschema Genome s/Any)
 
-(def TraitKey s/Any)
-(def TraitValue (s/maybe s/Num))
+(s/defschema TraitKey s/Any)
+(s/defschema TraitValue (s/maybe s/Num))
 
-(def Traits
+(s/defschema Traits
   "Traits are any information we want to know about an indivual. For single
   objective search we commonly use a `:value` trait.
 
@@ -17,20 +17,20 @@
   stored in this one flat map called `traits`"
   {TraitKey TraitValue})
 
-(def Individual
+(s/defschema Individual
   {:genome Genome
    :id s/Str
    :traits Traits
    :parent-ids #{s/Str}})
 
-(def Generation
+(s/defschema Generation
   "Holds the whole state for a current generation of individuals."
   {:index s/Int
    :individuals #{Individual}})
 
-(def Wrapper s/Any)
+(s/defschema Wrapper s/Any)
 
-(def Config
+(s/defschema Config
   "A search configuration is represented as a map. It contains all the data
    neccesary to run the search in a serializiable form, so that it can be
    preserved in a text form.
@@ -51,6 +51,6 @@
    :values {s/Keyword s/Any}
    :wrapper-forms [Wrapper]})
 
-(def SearchGraph
+(s/defschema SearchGraph
   "A graph that retuns a [Generation] from it's `:generations` key"
   (s/constrained Graph #(contains? % :generations)))

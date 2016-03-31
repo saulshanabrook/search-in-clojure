@@ -11,7 +11,7 @@
             [search.graphs.base.select :as select]
             [search.utils :as utils]))
 
-(def Metadata
+(s/defschema Metadata
   "Metadata about the search, including its configuration, id, and the trait specs."
   {:id s/Str
    :config schemas/Config
@@ -23,7 +23,7 @@
    (s/optional-key :alternation-p) utils/Probability})
 
 
-(def Recorder
+(s/defschema Recorder
   "responsible for displaying or saving the resaults of an execution."
   {:started! (s/=> nil Metadata)
    :generation! (s/=> nil Metadata schemas/Generation)

@@ -12,8 +12,8 @@
   (let [max_ (apply max xs)]
     (map #(long (/ max_ %)) xs)))
 
-(def TraitSpec {:lowest? s/Bool})
-(def TraitSpecs {schemas/TraitKey TraitSpec})
+(s/defschema TraitSpec {:lowest? s/Bool})
+(s/defschema TraitSpecs {schemas/TraitKey TraitSpec})
 
 (defnk-fn roulette :- schemas/Individual
   "Selects parent individuals, proportional to the `trait-name` trait of the

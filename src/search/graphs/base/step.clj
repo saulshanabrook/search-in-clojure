@@ -15,8 +15,8 @@
   {:index       (inc (:index generation))
    :individuals (utils/take-set n (breed generation))})
 
-(def Select (s/=> schemas/Individual #{schemas/Individual}))
-(def Tweak
+(s/defschema Select (s/=> schemas/Individual #{schemas/Individual}))
+(s/defschema Tweak
   "Take in some number of parent genomes and return a set of child genomes.
 
    mutate and crossover are two common examples"
@@ -24,7 +24,7 @@
    :n-parents s/Int
    :multiple-children? s/Bool})
 
-(def TweakLabel s/Keyword)
+(s/defschema TweakLabel s/Keyword)
 
 (defn ->seq-if
   "If `?` wrap val in a sequence, else return it directly"
