@@ -83,6 +83,15 @@ enable schema validation, which should help you verify and diagnose the
 execution. It does have some (untested) performance penalty so it is disabled
 by default.
 
+### Execution
+
+To run the evaluations in parallel, you can set a custom `map` function, by
+changing the `map-fn` key:
+
+```bash
+lein run ... -v '{:map-fn (partial com.climate.claypoole/pmap :builtin)}'
+```
+
 ## Contributing
 The code is split into two main subdirectory, `graphs` and `wrappers`.
 Primarily, the difference is that the `graphs` provides a bunch of, well, graphs

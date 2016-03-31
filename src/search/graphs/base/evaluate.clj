@@ -7,11 +7,12 @@
 (defnk-fn genome->traits-> :- schemas/Generation
   "Return an evaluated generation by settings the traits for each individual
    based on its genome"
-  [genome->traits :- (s/=> schemas/Traits schemas/Genome)]
+  [genome->traits :- (s/=> schemas/Traits schemas/Genome)
+   map-fn]
   [generation :- schemas/Generation]
   (assoc generation :individuals
     (set
-      (pmap
+      (map-fn
         (fn [ind]
           (let [traits (-> ind :genome genome->traits)]
             (assoc ind :traits traits)))

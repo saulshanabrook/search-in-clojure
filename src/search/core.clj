@@ -18,7 +18,8 @@
   (g/graph
    :default-graph (fnk [graph-symbols values wrapper-forms :as s]
                    {:id (fnk [] (utils/id))
-                    :config (utils/v->fnk s)})
+                    :config (utils/v->fnk s)
+                    :map-fn (utils/v->fnk map)})
    :graphs (fnk [graph-symbols :- [s/Symbol]] (map utils/symbol->value graph-symbols))
    :graph (fnk [graphs :- [utils/Graph]] (apply g/graph graphs))
    :values-graph (fnk [values :- {s/Keyword s/Any}]

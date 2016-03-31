@@ -15,6 +15,6 @@
         generation (-> schemas/Generation g/generate (assoc :individuals (into #{} (map ind-with-genome genomes))))
 
         genome->traits #(hash-map :value (count %))
-        evaluated-generation ((evaluate/genome->traits-> {:genome->traits genome->traits}) generation)
+        evaluated-generation ((evaluate/genome->traits-> {:genome->traits genome->traits :map-fn map}) generation)
         values  (sp/select [:individuals sp/ALL :traits :value] evaluated-generation)]
     (is (= #{3, 4} (into #{} values)))))
