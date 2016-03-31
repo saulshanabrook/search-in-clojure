@@ -20,10 +20,3 @@
     2 {0 2
        1 2
        2 0})))
-
-(deftest difference-squared-test
-  (are [in exp] (= exp (apply testcases/difference-squared in))
-    [0 0] 0
-    [1 0] 1
-    [0 1] 1
-    [-1 1] 4))

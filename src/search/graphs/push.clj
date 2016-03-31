@@ -46,7 +46,7 @@
   "Provides the `:->gene` for `search.graphs.seq/graph` by selecting a random
    push instruction. It also provides `:push-evaluate`."
   (g/graph
-    :step-limit (utils/v->fnk 500)
+    :step-limit (utils/v->fnk 1000)
     :interpreter interpreter
     :instructions instructions
     :push-evaluate evaluate

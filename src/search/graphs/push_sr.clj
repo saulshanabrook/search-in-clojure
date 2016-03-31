@@ -27,6 +27,16 @@
     vals
     (every? (partial about-equal wiggle-room 0))))
 
+
+(s/defn difference-squared :- (s/maybe s/Num)
+  [a :- (s/maybe s/Num)
+   b :- (s/maybe s/Num)]
+  (try
+    (let [diff (- a b)]
+      (* diff diff))
+    (catch NullPointerException _ nil)))
+
+
 (def graph
   (g/graph
     :ys (fnk [->y xs] (map ->y xs))
@@ -34,6 +44,7 @@
     :n-genes (utils/v->fnk 20)
     (g/instance push/graph {:push-bindings [:x]})
     :test-fn (fnk [push-evaluate] (fn [genome x] (push-evaluate genome {:x x})))
+    :test-output->trait-value (fnk [] difference-squared)
     testcases/graph
 
     :trait-specs (fnk trait-specs :- select/TraitSpecs
