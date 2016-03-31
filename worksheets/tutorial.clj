@@ -12,7 +12,8 @@
 ;; @@
 
 ;; @@
-(println schemas/Generation)
+(println "Individual" schemas/Individual)
+(println "Generation" schemas/Generation)
 ;; @@
 
 ;; @@
@@ -102,6 +103,10 @@ silly-config
 (def fun-generations (search/config->generations fun-config))
 ;; @@
 
+;; **
+;;; ### Resaults
+;; **
+
 ;; @@
 (-> fun-generations first :individuals first)
 ;; @@
@@ -153,7 +158,29 @@ silly-config
 ;; @@
 
 ;; @@
-(-> fun-generations last ->smallest-ind :genome)
+(def best-genome (-> fun-generations last ->smallest-ind :genome))
+
+best-genome
+;; @@
+
+;; **
+;;; ### Testing Model
+;; **
+
+;; @@
+(require '[clojure.repl :refer [source]])
+
+(source search/config->generations)
+;; @@
+
+;; @@
+(def fun-compute (:computed (search/compute-search fun-config)))
+(keys fun-compute)
+;; @@
+
+;; @@
+(def hopefully-times-four (partial (:test-fn fun-compute) best-genome))
+(hopefully-times-four -10)
 ;; @@
 
 ;; @@
