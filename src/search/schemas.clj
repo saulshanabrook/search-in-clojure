@@ -28,8 +28,6 @@
   {:index s/Int
    :individuals #{Individual}})
 
-(s/defschema Wrapper s/Any)
-
 (s/defschema Config
   "A search configuration is represented as a map. It contains all the data
    neccesary to run the search in a serializiable form, so that it can be
@@ -49,8 +47,15 @@
    `[(partial search.wrappers/log :some-key)]`."
   {:graph-symbols [s/Symbol]
    :values {s/Keyword s/Any}
-   :wrapper-forms [Wrapper]})
+   :wrapper-forms [s/Any]})
 
-(s/defschema SearchGraph
+(s/defschema Run
+  "A run is the result of executing a configuration. At the least, it holds
+   the configuration that generated it as well as a the list of generations
+   produced."
+  {:generations s/Any
+   :config Config})
+
+(s/defschema RunGraph
   "A graph that retuns a [Generation] from it's `:generations` key"
   (s/constrained Graph #(contains? % :generations)))

@@ -53,9 +53,9 @@
     (fnk profile-wrap-inner [ks f]
       (wrap-fn-profile (str ks :inner) f))))
 
-(s/defn print-profile-gen-wrap :- schemas/SearchGraph
+(s/defn print-profile-gen-wrap :- schemas/RunGraph
   "Prints the total profiling after each generation"
-  [{->gens :generations :as g} :- schemas/SearchGraph]
+  [{->gens :generations :as g} :- schemas/RunGraph]
   (assoc g :generations
     (utils/wrap ->gens
       (fn [m]

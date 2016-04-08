@@ -14,7 +14,9 @@
    :values values
    :wrapper-forms wrapper-forms})
 
-(def compute-search-graph
+(def config->run-graph
+  "A graph that defines how to take a config and create a graph from it, that,
+   when run, will produce the generations."
   (g/graph
    :default-graph (fnk [graph-symbols values wrapper-forms :as s]
                    {:id (fnk [] (utils/id))
@@ -27,7 +29,7 @@
                     (plumbing.core/map-vals utils/eval-load-ns)
                     (plumbing.core/map-vals utils/v->fnk)
                     g/graph))
-   :wrappers (fnk [wrapper-forms :- [schemas/Wrapper]] (map utils/eval-load-ns wrapper-forms))
+   :wrappers (fnk [wrapper-forms :- [s/Any]] (map utils/eval-load-ns wrapper-forms))
    :wrapper (fnk [wrappers :- [(s/=> utils/Graph utils/Graph)]] (apply comp (reverse wrappers)))
    :final-graph (fnk [default-graph :- utils/Graph
                       graph :- utils/Graph
@@ -37,15 +39,10 @@
                   (g/graph graph)
                   (merge values-graph)
                   wrapper))
-   :computed (fnk [final-graph :- schemas/SearchGraph] (g/run final-graph {}))))
+   :->run (fnk [final-graph :- schemas/RunGraph] (g/compile final-graph))
+   :run (fnk [->run] (->run {}))))
 
-(def compute-search (g/compile compute-search-graph))
-
-(s/defn config->generations ; infinite sequence of generations
-  "Computes the generations for this config. Returns a (possibly infinite)
-  lazy sequence of generations. The computation happens when you resolve them."
-  [config :- schemas/Config]
-  (-> config
-    compute-search
-    :computed
-    :generations))
+(def config->run
+  "Generates a `Run` from a `Config`. You can call `:generations` on the `run`
+   to get the results."
+  (comp :run (g/compile config->run-graph)))

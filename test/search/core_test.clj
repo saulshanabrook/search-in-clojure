@@ -36,9 +36,9 @@
 
 (defn is-first-generation
   [generation config-args]
-  (is (= generation (-> config-args search/->config search/config->generations first))))
+  (is (= generation (-> config-args search/->config search/config->run :generations first))))
 
-(deftest config->generations-test
+(deftest config->run-test
   (testing "one graph"
     (is-first-generation
       generation

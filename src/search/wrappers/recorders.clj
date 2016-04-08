@@ -30,10 +30,10 @@
    :done! (s/=> nil Metadata)})
 
 
-(s/defn wrap :- schemas/SearchGraph
+(s/defn wrap :- schemas/RunGraph
   "Modify graph g so that it records the run as it progresses"
   [{:keys [started! generation! done!]} :- Recorder
-   {->gens :generations :as g} :- schemas/SearchGraph]
+   {->gens :generations :as g} :- schemas/RunGraph]
   (assoc g :generations
     (pfnk/fn->fnk
       (fn [m]

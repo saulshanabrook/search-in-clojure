@@ -35,7 +35,7 @@
 (defn usage [options-summary]
   (clojure.string/join
     \newline
-    ["Creates and executes a search run."
+    ["Creates a config and executes run with it."
      ""
      "Usage: lein run [options]"
      ""
@@ -53,5 +53,6 @@
     (when (:validate-schema options) (s/set-fn-validation! true))
     (-> options
       (select-keys (keys schemas/Config))
-      search/config->generations
+      search/config->run
+      :generations
       dorun)))

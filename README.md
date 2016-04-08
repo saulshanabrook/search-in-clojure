@@ -19,7 +19,7 @@ knowledge of how everything connected.
 In contrast, this framework has a small core ([`search.core`](./src/search/core.clj))
 and implements all the interesting parts of search as pluggable modules.
 
-## Running searches
+## Runs
 ![ns graph](/docs/ns-hierarchy.png?raw=true)
 
 
@@ -29,10 +29,23 @@ us some nice (optional) runtime type validation as well as making the codebase
 more explicit. We use the plumbing library to do all of our computation with
 it's graph module.*
 
-Regardless of your algorithm or problem, the result of a search is a
-sequence of [`search.core/Generation`](./src/search/core.clj)s. The
-`search.core/config->generations` function is really the only core logic in
+A `Run` is one attempt to solve a problem. You can also think of this as an "experiment"
+or a "search". For example, it could be trying to solve a specific SR problem
+with push. It is created from a `Config`.
+
+Regardless of your algorithm or problem, your `Run` will have a `:generations`
+key that is a sequence of [`search.core/Generation`](./src/search/core.clj)s. The
+`search.core/config->run` function is really the only core logic in
 this library. The command line tool is just a small wrapper around this.
+
+In between making a `Run`, from a `Config`, we create a graph.
+
+```
+Config -> some graph -> Run
+```
+
+Once we have this graph we just run it with no arguments to generate the `Run`.
+So the `Config` specifies how to create the graph.
 
 The whole point of the `Config` is to create a graph with a `generations` key.
 At a minimum, it contains a list of graphs to merge together. For example,
@@ -42,8 +55,8 @@ we can combine a symbolic regression in push problem with a genetic algorithm:
 lein trampoline run -g '[search.graphs.problems.push-sr/plus-six-graph search.graphs.algorithms.genetic/graph]'
 ```
 
-The `-g` here stands for `graph-symbols`, which are just symbols that point
-to graphs. When these two graphs are merged together, then they have all the
+The `-g` here stands for `graph-symbols`.
+When these two graphs are merged together, then they have all the
 pieces needed to be able to be run to get the `generations` key.
 
 This isn't very interesting so far, however, because it is entirely side effect
