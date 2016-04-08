@@ -14,7 +14,7 @@
 (s/defn score :- {:value s/Int}
   "count of the number of ones in the list"
   [ind :- Genome]
-  {:value (apply + ind)})
+  {:count-ones (apply + ind)})
 
 (s/defn binary :- Gene
   "random int, either 1 or 0"
@@ -24,10 +24,10 @@
 (def graph
   (g/graph
     :->gene (utils/v->fnk binary)
-    (assoc (g/instance seq/graph {:n-genes 100})
-      :tweak-weights (utils/v->fnk {:mutate 1}))
+    :n-genes (utils/v->fnk 100)
+    seq/graph
     :mutate (g/instance seq/mutate {:p 0.01})
-    :genome->traits (fnk [] score)
-    :trait-specs (utils/v->fnk {:value {:lowest? false}})
-    :select (g/instance select/dominates {:trait-key :value})
-    :done? (g/instance done/any-trait {:traits->done? #(-> % :value (= 100))})))
+    :genome->traits (utils/v->fnk score)
+    :trait-specs (utils/v->fnk {:count-ones {:lowest? false}})
+    :select (g/instance select/dominates {:trait-key :count-ones})
+    :done? (g/instance done/any-trait {:traits->done? #(-> % :count-ones (= 100))})))

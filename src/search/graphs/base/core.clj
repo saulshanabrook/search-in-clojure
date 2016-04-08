@@ -10,7 +10,7 @@
 
   1. Gets the initial generation from `initial`.
   2. Call `evaluate` on the current generation, which should return
-     a generation whose `:individuals` have updated `traits`
+     a generation whose `individuals` have updated `traits`
   3. Check current generation is `done?`:
     1. If yes then return the current generation
     2. If no, then recur with a new generation, from `step`,

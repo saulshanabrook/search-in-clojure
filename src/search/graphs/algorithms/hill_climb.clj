@@ -13,26 +13,25 @@
 
 (defnk-fn breed :- [schemas/Individual]
   "Mutates the parent individual, scores it with `genome->traits` and then
-  selects
-   ."
-  [select :- (s/=> (utils/InfSeq schemas/Individual) #{schemas/Individual})
+  uses the `select` function to return the 'better' individual to keep."
+  [select :- (s/=> schemas/Individual #{schemas/Individual})
    genome->traits :-  (s/=> schemas/Traits schemas/Genome)
    mutate :- (s/=> schemas/Genome schemas/Genome)]
-  [{[& [parent]] :individuals :- schemas/Generation}]
-  (let [old-genome (:genome parent)
-        new-genome (mutate old-genome)
-        new-ind (assoc
-                 (step/->child-individual {:parent-ids #{(:id parent)}
-                                           :genome new-genome})
-                 :traits
-                 (genome->traits new-genome))]
-    (take 1 (select #{parent new-ind}))))
+  [prev-generation :- schemas/Generation]
+  (let [parent (first (:individuals prev-generation))
+        new-genome (mutate (:genome parent))
+        new-ind {:id (utils/id)
+                 :parent-ids #{(:id parent)}
+                 :genome new-genome
+                 :traits (genome->traits new-genome)}]
+    [(select #{parent new-ind})]))
 
 (def graph
   "[Hill climbing](https://en.wikipedia.org/wiki/Hill_climbing) algorithm
-  adapted for multiple objectives."
+   adapted for multiple objectives."
   (g/graph
     :initial (g/instance initial/->genome-> {:n 1})
     :evaluate evaluate/genome->traits->
-    (g/instance step/graph {:population-size 1})
-    :generations (g/instance base/generations {:n 1})))
+    :breed breed
+    :step (g/instance step/breed-> {:n 1})
+    :generations base/generations))

@@ -13,6 +13,9 @@
 
 ;; @@
 (println "Individual" schemas/Individual)
+;; @@
+
+;; @@
 (println "Generation" schemas/Generation)
 ;; @@
 
@@ -68,7 +71,7 @@ silly-config
 ;; @@
 (require '[search.graphs.push-sr :as push-sr]
          '[search.graphs.algorithms.genetic :as genetic]
-		 '[plumbing.fnk.pfnk :as pfnk]
+         '[plumbing.fnk.pfnk :as pfnk]
          '[plumbing.graph :as g])
 ;; @@
 
